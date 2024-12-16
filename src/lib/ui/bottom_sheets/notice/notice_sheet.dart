@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:my_app/ui/bottom_sheets/notice/notice_sheet_model.dart';
-import 'package:my_app/ui/common/app_colors.dart';
-import 'package:my_app/ui/common/ui_helpers.dart';
+import 'package:my_app/core/constants/colors.dart';
+import 'package:my_app/core/constants/text_styles.dart';
 
 class NoticeSheet extends StackedView<NoticeSheetModel> {
   final Function(SheetResponse)? completer;
   final SheetRequest request;
+
   const NoticeSheet({
     Key? key,
     required this.completer,
@@ -34,17 +35,15 @@ class NoticeSheet extends StackedView<NoticeSheetModel> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            request.title!,
-            style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w900),
+            request.title ?? '',
+            style: TextStyles.h3,
           ),
-          verticalSpaceTiny,
+          const SizedBox(height: 8),
           Text(
-            request.description!,
-            style: const TextStyle(fontSize: 14, color: kcMediumGrey),
-            maxLines: 3,
-            softWrap: true,
+            request.description ?? '',
+            style: TextStyles.body1.copyWith(color: AppColors.textSecondary),
           ),
-          verticalSpaceLarge,
+          const SizedBox(height: 24),
         ],
       ),
     );

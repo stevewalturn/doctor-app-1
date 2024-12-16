@@ -1,6 +1,6 @@
 import 'package:stacked/stacked.dart';
+import 'package:my_app/app/app.locator.dart';
 import 'package:my_app/models/consultation.dart';
-import 'package:my_app/models/diagnosis.dart';
 import 'package:my_app/services/consultation_service.dart';
 import 'package:stacked_services/stacked_services.dart';
 
@@ -43,16 +43,11 @@ class ConsultationViewModel extends BaseViewModel {
   Future<void> selectConsultation(String id) async {
     try {
       setBusy(true);
-      _selectedConsultation =
-          await _consultationService.getConsultationById(id);
+      _selectedConsultation = await _consultationService.getConsultationById(id);
       notifyListeners();
     } catch (e) {
       _modelError = e.toString();
       notifyListeners();
-      await _dialogService.showDialog(
-        title: 'Error',
-        description: e.toString(),
-      );
     } finally {
       setBusy(false);
     }
@@ -90,29 +85,12 @@ class ConsultationViewModel extends BaseViewModel {
     }
   }
 
-  Future<bool> addDiagnosis({
-    required String consultationId,
-    required String condition,
-    required String description,
-    required List<String> symptoms,
-    required List<String> treatments,
-    required List<String> medications,
-    required String notes,
-  }) async {
+  Future<void> deleteConsultation(String id) async {
     try {
       setBusy(true);
-      final diagnosis = await _consultationService.addDiagnosis(
-        consultationId: consultationId,
-        condition: condition,
-        description: description,
-        symptoms: symptoms,
-        treatments: treatments,
-        medications: medications,
-        notes: notes,
-      );
-      _selectedConsultation?.diagnoses.add(diagnosis);
+      await _consultationService.deleteConsultation(id);
+      _consultations.removeWhere((c) => c.id == id);
       notifyListeners();
-      return true;
     } catch (e) {
       _modelError = e.toString();
       notifyListeners();
@@ -120,36 +98,8 @@ class ConsultationViewModel extends BaseViewModel {
         title: 'Error',
         description: e.toString(),
       );
-      return false;
     } finally {
       setBusy(false);
-    }
-  }
-
-  Future<void> deleteConsultation(String id) async {
-    final response = await _dialogService.showConfirmationDialog(
-      title: 'Delete Consultation',
-      description: 'Are you sure you want to delete this consultation?',
-      confirmationTitle: 'Delete',
-      cancelTitle: 'Cancel',
-    );
-
-    if (response?.confirmed ?? false) {
-      try {
-        setBusy(true);
-        await _consultationService.deleteConsultation(id);
-        _consultations.removeWhere((c) => c.id == id);
-        notifyListeners();
-      } catch (e) {
-        _modelError = e.toString();
-        notifyListeners();
-        await _dialogService.showDialog(
-          title: 'Error',
-          description: e.toString(),
-        );
-      } finally {
-        setBusy(false);
-      }
     }
   }
 }

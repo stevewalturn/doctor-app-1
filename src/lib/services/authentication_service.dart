@@ -1,19 +1,22 @@
 import 'package:stacked/stacked.dart';
 import 'package:my_app/models/user.dart';
+import 'package:my_app/app/app.locator.dart';
 import 'package:my_app/services/api_service.dart';
 import 'package:my_app/services/storage_service.dart';
 
-class AuthenticationService with InitializableDependency {
-  final ApiService _apiService;
-  final StorageService _storageService;
+class AuthenticationService with ListenableServiceMixin {
+  final _apiService = locator<ApiService>();
+  final _storageService = locator<StorageService>();
+
   User? _currentUser;
-
-  AuthenticationService(this._apiService, this._storageService);
-
+  
   User? get currentUser => _currentUser;
   bool get isAuthenticated => _currentUser != null;
 
-  @override
+  AuthenticationService() {
+    listenToReactiveValues([_currentUser]);
+  }
+
   Future<void> init() async {
     final token = await _storageService.getAuthToken();
     if (token != null) {
@@ -47,7 +50,7 @@ class AuthenticationService with InitializableDependency {
 
   Future<User> register({
     required String name,
-    required String email,
+    required String email, 
     required String password,
     required String specialization,
   }) async {
@@ -57,7 +60,6 @@ class AuthenticationService with InitializableDependency {
         'email': email,
         'password': password,
         'specialization': specialization,
-        'role': 'doctor',
       });
 
       final token = response['token'] as String;
@@ -83,27 +85,10 @@ class AuthenticationService with InitializableDependency {
     }
   }
 
-  Future<void> resetPassword(String email) async {
-    try {
-      await _apiService.post('/auth/reset-password', {'email': email});
-    } catch (e) {
-      throw _handleAuthError(e);
-    }
-  }
-
   String _handleAuthError(dynamic error) {
-    if (error is HttpException) {
-      switch (error.statusCode) {
-        case 401:
-          return 'Invalid email or password. Please try again.';
-        case 409:
-          return 'An account with this email already exists.';
-        case 422:
-          return 'Please check your input and try again.';
-        default:
-          return 'Authentication failed. Please try again later.';
-      }
+    if (error is Exception) {
+      return 'Authentication failed. Please try again.';
     }
-    return 'Unable to connect to the server. Please check your internet connection.';
+    return error.toString();
   }
 }

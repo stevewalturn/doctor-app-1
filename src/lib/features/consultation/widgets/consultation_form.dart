@@ -9,10 +9,10 @@ class ConsultationForm extends StatefulWidget {
   final bool isLoading;
 
   const ConsultationForm({
-    super.key,
+    Key? key,
     required this.onSubmit,
     this.isLoading = false,
-  });
+  }) : super(key: key);
 
   @override
   State<ConsultationForm> createState() => _ConsultationFormState();
@@ -41,16 +41,13 @@ class _ConsultationFormState extends State<ConsultationForm> {
     });
   }
 
-  Future<void> _selectFollowUpDate() async {
-    final date = await showDatePicker(
-      context: context,
-      initialDate: _followUpDate ?? DateTime.now().add(const Duration(days: 7)),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-    if (date != null) {
-      setState(() {
-        _followUpDate = date;
+  Future<void> _handleSubmit() async {
+    if (_formKey.currentState?.validate() == true) {
+      widget.onSubmit({
+        'chiefComplaint': _chiefComplaintController.text,
+        'symptoms': _symptoms,
+        'notes': _notesController.text,
+        'followUpDate': _followUpDate?.toIso8601String(),
       });
     }
   }
@@ -78,8 +75,7 @@ class _ConsultationFormState extends State<ConsultationForm> {
                 child: CustomTextField(
                   controller: _newSymptomController,
                   hint: 'Add symptom',
-                  textInputAction: TextInputAction.done,
-                  onSubmitted: (value) => _addSymptom(value),
+                  onChanged: (value) => _addSymptom(value),
                 ),
               ),
               IconButton(
@@ -130,24 +126,27 @@ class _ConsultationFormState extends State<ConsultationForm> {
           const SizedBox(height: 32),
           CustomButton(
             text: 'Save Consultation',
-            onPressed: widget.isLoading
-                ? null
-                : () {
-                    if (_formKey.currentState!.validate()) {
-                      widget.onSubmit({
-                        'chiefComplaint': _chiefComplaintController.text,
-                        'symptoms': _symptoms,
-                        'notes': _notesController.text,
-                        'followUpDate': _followUpDate?.toIso8601String(),
-                      });
-                    }
-                  },
+            onPressed: widget.isLoading ? null : _handleSubmit,
             isLoading: widget.isLoading,
             width: double.infinity,
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _selectFollowUpDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _followUpDate ?? DateTime.now().add(const Duration(days: 7)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (date != null) {
+      setState(() {
+        _followUpDate = date;
+      });
+    }
   }
 
   @override
