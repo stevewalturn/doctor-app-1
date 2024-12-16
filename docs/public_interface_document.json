@@ -1,7 +1,7 @@
 {
   "package_name": "com.walturn.my_app",
-  "project_description": "A Flutter project using the Stacked architecture, featuring routing, dependency injection, and dialog/bottom sheet management.",
-  "architecture_overview": "The application follows the Stacked architecture with separate folders for app setup, features, UI components, and utilities. It uses Stacked for state management, routing, and dependency injection.",
+  "project_description": "The Flutter application is a healthcare management platform that allows users to manage patient consultations, diagnoses, and other medical records. It features a dashboard view, a patient management system, a consultation management module, and authentication functionality.",
+  "architecture_overview": "The application follows the Stacked architecture pattern, which provides a clear separation of concerns between the user interface, view models, and service layers. It uses Stacked for state management, routing, and dependency injection, as well as the shared_preferences package for local data storage.",
   "files": [
     {
       "name": "lib/app/app.dart",
@@ -113,6 +113,1996 @@
         "package:my_app/app/app.locator.dart",
         "package:my_app/features/app/app_view.dart"
       ]
+    },
+    {
+      "name": "lib/core/constants/colors.dart",
+      "description": "This file defines a central repository of color constants used throughout the application. It provides a consistent and reusable set of colors that align with the app's visual identity and branding.",
+      "class_diagram": "@startuml\nclass AppColors {\n  +static final Color primary\n  +static final Color primaryLight\n  +static final Color primaryDark\n  +static final Color secondary\n  +static final Color secondaryLight\n  +static final Color secondaryDark\n  +static final Color accent\n  +static final Color accentLight\n  +static final Color accentDark\n  +static final Color success\n  +static final Color warning\n  +static final Color error\n  +static final Color info\n  +static final Color white\n  +static final Color background\n  +static final Color surfaceLight\n  +static final Color surface\n  +static final Color divider\n  +static final Color disabled\n  +static final Color textPrimary\n  +static final Color textSecondary\n  +static final Color textTertiary\n  +static final Color textLight\n  +static final Color shadow\n  +static final Color shadowLight\n  +static final LinearGradient primaryGradient\n  +static final LinearGradient secondaryGradient\n  +static final LinearGradient accentGradient\n}\n@enduml",
+      "methods": [
+        {
+          "name": "AppColors",
+          "description": "This is a utility class that provides a centralized location for defining and managing the application's color palette.",
+          "parameters": null,
+          "return_type": null
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart"
+      ]
+    },
+    {
+      "name": "lib/app/app.locator.dart",
+      "description": "This file is responsible for setting up and managing the dependency injection and service locator for the Flutter application. It is a generated file that is part of the Stacked architecture pattern, which is a popular pattern used in Flutter development.",
+      "class_diagram": "@startuml\nclass StackedLocator {\n  + static instance: StackedLocator\n  + registerEnvironment(environment, environmentFilter)\n  + registerLazySingleton(factory)\n}\n\nclass BottomSheetService {\n}\n\nclass DialogService {\n}\n\nclass NavigationService {\n}\n\nStackedLocator o-- BottomSheetService\nStackedLocator o-- DialogService\nStackedLocator o-- NavigationService\n@enduml",
+      "methods": [
+        {
+          "name": "setupLocator",
+          "description": "This method is responsible for setting up the dependency injection and service locator. It registers the environment, and then registers the various services that the application will use, such as the BottomSheetService, DialogService, and NavigationService.",
+          "parameters": [
+            "environment",
+            "environmentFilter"
+          ],
+          "return_type": "Future<void>"
+        }
+      ],
+      "dependencies": [
+        "stacked_services/src/bottom_sheet/bottom_sheet_service.dart",
+        "stacked_services/src/dialog/dialog_service.dart",
+        "stacked_services/src/navigation/navigation_service.dart",
+        "stacked_shared/stacked_shared.dart"
+      ]
+    },
+    {
+      "name": "lib/app/app.dialogs.dart",
+      "description": "This file is responsible for setting up the dialog service in the application. It defines the available dialog types and registers custom dialog builders for them. The primary purpose is to provide a centralized and consistent way of handling various types of dialogs across the application.",
+      "class_diagram": "@startuml\n\nclass InfoAlertDialog {\n  +request: DialogRequest\n  +completer: DialogCompleter\n  +build(context): Widget\n}\n\nclass DialogService {\n  +registerCustomDialogBuilders(builders: Map<DialogType, DialogBuilder>): void\n}\n\nclass DialogType {\n  +infoAlert\n}\n\nDialogService -down-> InfoAlertDialog : Registers\nInfoAlertDialog -down-> DialogRequest, DialogCompleter : Uses\n\n@enduml",
+      "methods": [
+        {
+          "name": "setupDialogUi",
+          "description": "Registers the custom dialog builders for the available dialog types with the DialogService.",
+          "parameters": [
+            "None"
+          ],
+          "return_type": "void"
+        }
+      ],
+      "dependencies": [
+        "stacked_services",
+        "app.locator",
+        "../ui/dialogs/info_alert/info_alert_dialog.dart"
+      ]
+    },
+    {
+      "name": "lib/app/app.bottomsheets.dart",
+      "description": "This file is responsible for setting up the bottom sheet UI for the application. It defines the different types of bottom sheets that can be used and provides a central location for registering the bottom sheet builders.",
+      "class_diagram": "@startuml\n\nclass BottomSheetService {\n  setCustomSheetBuilders(Map<BottomSheetType, SheetBuilder>)\n}\n\nclass NoticeSheet {\n  NoticeSheet(request, completer)\n}\n\nenum BottomSheetType {\n  notice\n}\n\nBottomSheetService *-- BottomSheetType\nBottomSheetService *-- NoticeSheet\n\n@enduml",
+      "methods": [
+        {
+          "name": "setupBottomSheetUi",
+          "description": "Configures the BottomSheetService with the custom sheet builders for the different bottom sheet types.",
+          "parameters": [
+            "context",
+            "request",
+            "completer"
+          ],
+          "return_type": "void"
+        }
+      ],
+      "dependencies": [
+        "stacked_services/stacked_services.dart",
+        "app.locator.dart",
+        "ui/bottom_sheets/notice/notice_sheet.dart"
+      ]
+    },
+    {
+      "name": "lib/models/user.dart",
+      "description": "This Dart file defines the `User` class, which represents a user entity in the application. The `User` class is responsible for encapsulating and managing user-related data, such as the user's ID, email, name, role, specialization, profile image URL, and creation/update timestamps.",
+      "class_diagram": "@startuml\nclass User {\n  -String id\n  -String email\n  -String name\n  -String role\n  -String? specialization\n  -String? profileImageUrl\n  -DateTime createdAt\n  -DateTime updatedAt\n\n  +factory User.fromJson(Map<String, dynamic> json)\n  +Map<String, dynamic> toJson()\n  +User copyWith({...})\n}\n@enduml",
+      "methods": [
+        {
+          "name": "User",
+          "description": "Constructs a new `User` instance with the provided parameters.",
+          "parameters": [
+            "id",
+            "email",
+            "name",
+            "role",
+            "specialization",
+            "profileImageUrl",
+            "createdAt",
+            "updatedAt"
+          ],
+          "return_type": "User"
+        },
+        {
+          "name": "fromJson",
+          "description": "Constructs a `User` instance from a JSON map.",
+          "parameters": [
+            "json"
+          ],
+          "return_type": "User"
+        },
+        {
+          "name": "toJson",
+          "description": "Converts the `User` instance to a JSON map.",
+          "parameters": null,
+          "return_type": "Map<String, dynamic>"
+        },
+        {
+          "name": "copyWith",
+          "description": "Creates a new `User` instance with the specified properties overridden.",
+          "parameters": [
+            "id",
+            "email",
+            "name",
+            "role",
+            "specialization",
+            "profileImageUrl",
+            "createdAt",
+            "updatedAt"
+          ],
+          "return_type": "User"
+        }
+      ],
+      "dependencies": [
+        "package:equatable/equatable.dart"
+      ]
+    },
+    {
+      "name": "lib/features/app/app_viewmodel.dart",
+      "description": "The AppViewModel class is responsible for managing the state and behavior of the app-level functionality in a Flutter application. It serves as a view model for the app's top-level components, providing a centralized point of control and coordination.",
+      "class_diagram": "@startuml\nclass AppViewModel {\n  +void notifyListeners()\n  +void setBusy(bool value)\n  +bool get isBusy\n}\n@enduml",
+      "methods": [
+        {
+          "name": "notifyListeners",
+          "description": "Notifies all registered listeners that the view model's state has changed, triggering a UI update.",
+          "parameters": null,
+          "return_type": "void"
+        },
+        {
+          "name": "setBusy",
+          "description": "Sets the busy state of the view model, which can be used to display loading indicators or disable user interactions during long-running operations.",
+          "parameters": [
+            "bool value"
+          ],
+          "return_type": "void"
+        },
+        {
+          "name": "get isBusy",
+          "description": "Returns the current busy state of the view model.",
+          "parameters": null,
+          "return_type": "bool"
+        }
+      ],
+      "dependencies": [
+        "package:stacked/stacked.dart"
+      ]
+    },
+    {
+      "name": "lib/features/consultation/widgets/diagnosis_input.dart",
+      "description": "The DiagnosisInput widget is responsible for providing a user interface for capturing a patient's diagnosis details, including the condition, description, symptoms, treatments, medications, and notes. This widget is a key part of the consultation feature, which allows healthcare providers to document and manage a patient's medical information.",
+      "class_diagram": "@startuml\nclass DiagnosisInput {\n  -GlobalKey<FormState> _formKey\n  -TextEditingController _conditionController\n  -TextEditingController _descriptionController\n  -List<String> _symptoms\n  -List<String> _treatments\n  -List<String> _medications\n  -TextEditingController _notesController\n  -TextEditingController _newItemController\n\n  +Function(Map<String, dynamic>) onSave\n  +VoidCallback? onCancel\n\n  +_addToList(List<String> list, String item)\n  +_removeFromList(List<String> list, String item)\n  +_buildChipsList(List<String> items, Function(String) onRemove)\n}\n@enduml",
+      "methods": [
+        {
+          "name": "_addToList",
+          "description": "Adds a new item to the specified list if the item is not empty and not already in the list.",
+          "parameters": [
+            "List<String> list",
+            "String item"
+          ],
+          "return_type": "void"
+        },
+        {
+          "name": "_removeFromList",
+          "description": "Removes the specified item from the list.",
+          "parameters": [
+            "List<String> list",
+            "String item"
+          ],
+          "return_type": "void"
+        },
+        {
+          "name": "_buildChipsList",
+          "description": "Builds a Wrap widget with Chip widgets for the items in the specified list. Each Chip has a delete icon that calls the provided onRemove function.",
+          "parameters": [
+            "List<String> items",
+            "Function(String) onRemove"
+          ],
+          "return_type": "Widget"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart",
+        "package:my_app/ui/widgets/custom_text_field.dart",
+        "package:my_app/ui/widgets/custom_button.dart"
+      ]
+    },
+    {
+      "name": "lib/features/dashboard/widgets/stats_card.dart",
+      "description": "The `StatsCard` widget is responsible for displaying a visual card with key statistics or metrics within the dashboard feature of the application. It provides a reusable and customizable UI component that can be used to showcase important data points to the user.",
+      "class_diagram": "@startuml\nclass StatsCard {\n  -String title\n  -String value\n  -IconData icon\n  -Color? backgroundColor\n  -Color? iconColor\n  -VoidCallback? onTap\n  +build(context): Widget\n}\n@enduml",
+      "methods": [
+        {
+          "name": "build",
+          "description": "Builds the UI for the `StatsCard` widget, which includes a container with a customizable background color, an icon, the statistic value, and the title.",
+          "parameters": [
+            "context"
+          ],
+          "return_type": "Widget"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart"
+      ]
+    },
+    {
+      "name": "lib/features/dashboard/dashboard_viewmodel.dart",
+      "description": "The `DashboardViewModel` class is responsible for managing the data and logic related to the dashboard feature of the application. It provides the main functionality to retrieve and display high-level statistics and recent data about patients and consultations.",
+      "class_diagram": "@startuml\nclass DashboardViewModel {\n  - DashboardRepository _repository\n  - int _totalPatients\n  - int _totalConsultations\n  - int _pendingConsultations\n  - List<Consultation> _recentConsultations\n  - List<Patient> _recentPatients\n  - String? _modelError\n\n  + int get totalPatients\n  + int get totalConsultations\n  + int get pendingConsultations\n  + List<Consultation> get recentConsultations\n  + List<Patient> get recentPatients\n  + String? get modelError\n\n  + Future<void> initialize()\n  + Future<void> loadDashboardStats()\n  + Future<void> loadRecentConsultations()\n  + Future<void> loadRecentPatients()\n  + Future<void> refreshDashboard()\n}\n\nclass DashboardRepository {\n  + Future<Map<String, int>> getDashboardStats()\n  + Future<List<Consultation>> getRecentConsultations()\n  + Future<List<Patient>> getRecentPatients()\n}\n@enduml",
+      "methods": [
+        {
+          "name": "initialize",
+          "description": "Initializes the dashboard view model by loading the dashboard stats, recent consultations, and recent patients.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "loadDashboardStats",
+          "description": "Retrieves the dashboard statistics (total patients, total consultations, and pending consultations) from the repository and updates the view model's properties.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "loadRecentConsultations",
+          "description": "Retrieves the most recent consultations from the repository and updates the view model's `recentConsultations` property.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "loadRecentPatients",
+          "description": "Retrieves the most recent patients from the repository and updates the view model's `recentPatients` property.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "refreshDashboard",
+          "description": "Refreshes the dashboard data by re-initializing the view model.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        }
+      ],
+      "dependencies": [
+        "stacked",
+        "my_app/models/consultation.dart",
+        "my_app/models/patient.dart",
+        "my_app/features/dashboard/dashboard_repository.dart"
+      ]
+    },
+    {
+      "name": "lib/features/dashboard/dashboard_repository.dart",
+      "description": "This Dart file defines the DashboardRepository class, which is responsible for fetching and managing the key data used in the dashboard feature of the application. It acts as an intermediary between the UI layer and the backend API, handling data retrieval, error handling, and transformation.",
+      "class_diagram": "@startuml\nclass DashboardRepository {\n  -ApiService _apiService\n  +Future<Map<String, dynamic>> getDashboardStats()\n  +Future<List<Consultation>> getRecentConsultations()\n  +Future<List<Patient>> getRecentPatients()\n  -String _handleDashboardError(dynamic error)\n}\n@enduml",
+      "methods": [
+        {
+          "name": "getDashboardStats",
+          "description": "Fetches the high-level dashboard statistics, such as total consultations, patients, and other key metrics.",
+          "parameters": null,
+          "return_type": "Future<Map<String, dynamic>>"
+        },
+        {
+          "name": "getRecentConsultations",
+          "description": "Retrieves a list of the most recent consultations performed by the medical staff.",
+          "parameters": null,
+          "return_type": "Future<List<Consultation>>"
+        },
+        {
+          "name": "getRecentPatients",
+          "description": "Fetches a list of the most recent patients added to the system.",
+          "parameters": null,
+          "return_type": "Future<List<Patient>>"
+        },
+        {
+          "name": "_handleDashboardError",
+          "description": "Centralizes the error handling for the dashboard-related API calls, providing user-friendly error messages based on the HTTP status code.",
+          "parameters": [
+            "dynamic error"
+          ],
+          "return_type": "String"
+        }
+      ],
+      "dependencies": [
+        "my_app/models/consultation.dart",
+        "my_app/models/patient.dart",
+        "my_app/services/api_service.dart"
+      ]
+    },
+    {
+      "name": "lib/features/auth/login_view.dart",
+      "description": "The `LoginView` is a Flutter screen responsible for handling user authentication by allowing them to log in to the application. It provides a user interface for entering email and password credentials, and integrates with the `AuthViewModel` to handle the login process.",
+      "class_diagram": "@startuml\nclass LoginView extends StackedView<AuthViewModel> {\n  + builder(BuildContext context, AuthViewModel model, Widget? child): Widget\n  + viewModelBuilder(BuildContext context): AuthViewModel\n}\n\nclass AuthViewModel {\n  + setEmail(String email): void\n  + setPassword(String password): void\n  + login(): Future<void>\n  + navigateToRegister(): void\n  - authenticationService\n  - navigationService\n  - dialogService\n}\n@enduml",
+      "methods": [
+        {
+          "name": "builder",
+          "description": "Builds the UI for the login screen, including input fields for email and password, a login button, and a link to the registration screen.",
+          "parameters": [
+            "BuildContext context",
+            "AuthViewModel model",
+            "Widget? child"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "viewModelBuilder",
+          "description": "Provides an instance of the `AuthViewModel` to the `StackedView` for managing the authentication logic.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "AuthViewModel"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:stacked/stacked.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart",
+        "package:my_app/features/auth/auth_viewmodel.dart",
+        "package:my_app/features/auth/widgets/auth_button.dart",
+        "package:my_app/features/auth/widgets/auth_text_field.dart"
+      ]
+    },
+    {
+      "name": "lib/features/auth/widgets/auth_button.dart",
+      "description": "The AuthButton widget is responsible for rendering a customizable button for authentication-related actions within the application. It provides a consistent and visually appealing button design that can be used across different authentication screens, such as login, sign-up, or password reset.",
+      "class_diagram": "@startuml\nclass AuthButton extends StatelessWidget {\n  -String text\n  -VoidCallback onPressed\n  -bool isLoading\n  -bool isOutlined\n  +build(BuildContext context): Widget\n}\n@enduml",
+      "methods": [
+        {
+          "name": "build",
+          "description": "Constructs the UI representation of the AuthButton widget, using the CustomButton widget to handle the button's functionality and appearance.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "Widget"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:my_app/ui/widgets/custom_button.dart",
+        "package:my_app/core/constants/colors.dart"
+      ]
+    },
+    {
+      "name": "lib/features/auth/widgets/auth_text_field.dart",
+      "description": "The AuthTextField class is responsible for rendering a custom text field with specific styling and behavior for the authentication flow of the application. It provides a reusable, consistent UI element for handling user input in the authentication process.",
+      "class_diagram": "@startuml\nclass AuthTextField {\n  -String label\n  -String hint\n  -bool isPassword\n  -TextEditingController? controller\n  -ValueChanged<String>? onChanged\n  -String? errorText\n  -TextInputType keyboardType\n  -TextInputAction textInputAction\n  +build(BuildContext context): Widget\n}\n\nAuthTextField --> CustomTextField : Uses\n@enduml",
+      "methods": [
+        {
+          "name": "build",
+          "description": "Builds the AuthTextField widget, which is a wrapper around the CustomTextField widget. It takes in various parameters to customize the text field's behavior and appearance.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "Widget"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:my_app/ui/widgets/custom_text_field.dart"
+      ]
+    },
+    {
+      "name": "lib/features/auth/register_view.dart",
+      "description": "The RegisterView class is responsible for displaying the user registration screen in the application. It handles the user input, validation, and the registration process.",
+      "class_diagram": "@startuml\nclass RegisterView extends StackedView<AuthViewModel> {\n  +builder(BuildContext context, AuthViewModel model, Widget? child): Widget\n  +viewModelBuilder(BuildContext context): AuthViewModel\n}\n\nclass AuthViewModel {\n  +setName(String name): void\n  +setEmail(String email): void\n  +setSpecialization(String specialization): void\n  +setPassword(String password): void\n  +register(): Future<void>\n  +navigateToLogin(): void\n  +modelError: String\n  +isBusy: bool\n}\n@enduml",
+      "methods": [
+        {
+          "name": "builder",
+          "description": "Builds the UI for the registration screen, including input fields, validation, and the registration button.",
+          "parameters": [
+            "BuildContext context",
+            "AuthViewModel model",
+            "Widget? child"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "viewModelBuilder",
+          "description": "Provides the AuthViewModel instance to the StackedView.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "AuthViewModel"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:stacked/stacked.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart",
+        "package:my_app/features/auth/auth_viewmodel.dart",
+        "package:my_app/features/auth/widgets/auth_button.dart",
+        "package:my_app/features/auth/widgets/auth_text_field.dart",
+        "package:my_app/ui/widgets/custom_app_bar.dart"
+      ]
+    },
+    {
+      "name": "lib/models/diagnosis.dart",
+      "description": "The Diagnosis class represents a medical diagnosis, including information about the condition, symptoms, treatments, medications, and related details. It is a key data model in an application that manages patient medical records and care.",
+      "class_diagram": "@startuml\nclass Diagnosis {\n  -String id\n  -String consultationId\n  -String condition\n  -String description\n  -List<String> symptoms\n  -List<String> treatments\n  -List<String> medications\n  -String notes\n  -DateTime createdAt\n  -DateTime updatedAt\n  \n  +Diagnosis.fromJson(Map<String, dynamic> json)\n  +Map<String, dynamic> toJson()\n  +Diagnosis copyWith({...})\n}\n@enduml",
+      "methods": [
+        {
+          "name": "Diagnosis",
+          "description": "Constructor that initializes the diagnosis object with the required fields.",
+          "parameters": [
+            "id",
+            "consultationId",
+            "condition",
+            "description",
+            "symptoms",
+            "treatments",
+            "medications",
+            "notes",
+            "createdAt",
+            "updatedAt"
+          ],
+          "return_type": null
+        },
+        {
+          "name": "Diagnosis.fromJson",
+          "description": "Factory constructor that creates a Diagnosis object from a JSON map.",
+          "parameters": [
+            "Map<String, dynamic> json"
+          ],
+          "return_type": "Diagnosis"
+        },
+        {
+          "name": "toJson",
+          "description": "Converts the Diagnosis object to a JSON map.",
+          "parameters": null,
+          "return_type": "Map<String, dynamic>"
+        },
+        {
+          "name": "copyWith",
+          "description": "Creates a new Diagnosis object with the specified field values, while keeping the unchanged fields from the original object.",
+          "parameters": [
+            "id",
+            "consultationId",
+            "condition",
+            "description",
+            "symptoms",
+            "treatments",
+            "medications",
+            "notes",
+            "createdAt",
+            "updatedAt"
+          ],
+          "return_type": "Diagnosis"
+        }
+      ],
+      "dependencies": [
+        "package:equatable/equatable.dart"
+      ]
+    },
+    {
+      "name": "lib/features/patients/patients_view.dart",
+      "description": "The PatientsView class is responsible for displaying the list of patients and providing key functionality for managing patient records. It serves as the main UI for the patient management feature of the application.",
+      "class_diagram": "@startuml\nclass PatientsView {\n  + builder(BuildContext, PatientsViewModel, Widget?): Widget\n  + viewModelBuilder(BuildContext): PatientsViewModel\n  + onViewModelReady(PatientsViewModel): void\n}\n\nclass PatientsViewModel {\n  + loadPatients(): Future<void>\n  + setSearchQuery(String): void\n  + navigateToAddPatient(): void\n  + navigateToPatientDetails(Patient): void\n  + deletePatient(Patient): Future<void>\n}\n\nPatientsView *-- PatientsViewModel\n@enduml",
+      "methods": [
+        {
+          "name": "builder",
+          "description": "Builds the UI for the PatientsView, displaying the list of patients, search functionality, and actions for adding and managing patients.",
+          "parameters": [
+            "BuildContext",
+            "PatientsViewModel",
+            "Widget?"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "viewModelBuilder",
+          "description": "Provides an instance of the PatientsViewModel, which is responsible for the business logic and data management for the patients feature.",
+          "parameters": [
+            "BuildContext"
+          ],
+          "return_type": "PatientsViewModel"
+        },
+        {
+          "name": "onViewModelReady",
+          "description": "Initializes the PatientsViewModel when the PatientsView is ready.",
+          "parameters": [
+            "PatientsViewModel"
+          ],
+          "return_type": null
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:stacked/stacked.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart",
+        "package:my_app/features/patients/patients_viewmodel.dart",
+        "package:my_app/features/patients/widgets/patient_card.dart",
+        "package:my_app/ui/widgets/custom_app_bar.dart",
+        "package:my_app/ui/widgets/custom_text_field.dart",
+        "package:my_app/ui/widgets/loading_indicator.dart"
+      ]
+    },
+    {
+      "name": "lib/features/patients/add_patient_view.dart",
+      "description": "The `AddPatientView` class is responsible for providing a user interface for adding a new patient to the application. It is part of the `patients` feature and is responsible for collecting the necessary patient information, validating the input, and submitting the data to the backend.",
+      "class_diagram": "@startuml\nclass AddPatientView {\n  +builder(BuildContext, PatientsViewModel, Widget): Widget\n  +viewModelBuilder(BuildContext): PatientsViewModel\n}\n\nclass PatientsViewModel {\n  +patientsRepository\n  +navigationService\n  +dialogService\n  +isBusy: bool\n  +modelError: String\n  +savePatient()\n}\n\nAddPatientView --> PatientsViewModel : uses\n@enduml",
+      "methods": [
+        {
+          "name": "builder",
+          "description": "The `builder` method is responsible for rendering the UI of the `AddPatientView`. It sets up the Scaffold, AppBar, and the form fields for collecting patient information. It also handles displaying any error messages and the save button.",
+          "parameters": [
+            "BuildContext",
+            "PatientsViewModel",
+            "Widget"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "viewModelBuilder",
+          "description": "The `viewModelBuilder` method is responsible for creating an instance of the `PatientsViewModel`, which is used to manage the state and logic of the `AddPatientView`.",
+          "parameters": [
+            "BuildContext"
+          ],
+          "return_type": "PatientsViewModel"
+        }
+      ],
+      "dependencies": [
+        "flutter/material.dart",
+        "stacked/stacked.dart",
+        "my_app/core/constants/colors.dart",
+        "my_app/core/constants/text_styles.dart",
+        "my_app/features/patients/patients_viewmodel.dart",
+        "my_app/ui/widgets/custom_app_bar.dart",
+        "my_app/ui/widgets/custom_text_field.dart",
+        "my_app/ui/widgets/custom_button.dart"
+      ]
+    },
+    {
+      "name": "lib/features/patients/patients_viewmodel.dart",
+      "description": "The `PatientsViewModel` class is responsible for managing the state and functionality of the patient management feature in the application. It serves as the view model for the patient-related user interface components, providing the necessary data and operations to display, search, add, and delete patient records.",
+      "class_diagram": "@startuml\nclass PatientsViewModel {\n  - PatientsRepository _repository\n  - NavigationService _navigationService\n  - DialogService _dialogService\n  - List<Patient> _patients\n  - String? _searchQuery\n  - String? _modelError\n\n  + List<Patient> get patients\n  + String? get searchQuery\n  + String? get modelError\n  + List<Patient> get filteredPatients\n  + Future<void> initialize()\n  + Future<void> loadPatients()\n  + void setSearchQuery(String query)\n  + Future<void> navigateToAddPatient()\n  + Future<void> navigateToPatientDetails(Patient patient)\n  + Future<void> deletePatient(Patient patient)\n}\n\nPatientsViewModel --> PatientsRepository\nPatientsViewModel --> NavigationService\nPatientsViewModel --> DialogService\n@enduml",
+      "methods": [
+        {
+          "name": "initialize",
+          "description": "Initializes the view model by loading the list of patients from the repository.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "loadPatients",
+          "description": "Retrieves the list of patients from the repository and updates the view model's state.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "setSearchQuery",
+          "description": "Sets the search query for filtering the list of patients.",
+          "parameters": [
+            "String query"
+          ],
+          "return_type": "void"
+        },
+        {
+          "name": "navigateToAddPatient",
+          "description": "Navigates to the view for adding a new patient.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "navigateToPatientDetails",
+          "description": "Navigates to the view for displaying the details of a specific patient.",
+          "parameters": [
+            "Patient patient"
+          ],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "deletePatient",
+          "description": "Deletes a patient from the repository, updates the list of patients, and displays a success or error message.",
+          "parameters": [
+            "Patient patient"
+          ],
+          "return_type": "Future<void>"
+        }
+      ],
+      "dependencies": [
+        "package:stacked/stacked.dart",
+        "package:my_app/models/patient.dart",
+        "package:my_app/features/patients/patients_repository.dart",
+        "package:my_app/app/app.router.dart",
+        "package:stacked_services/stacked_services.dart"
+      ]
+    },
+    {
+      "name": "lib/features/patients/widgets/patient_card.dart",
+      "description": "The PatientCard widget is responsible for rendering a card-like UI element that displays key information about a patient. It serves as a reusable component for presenting patient details in various parts of the application.",
+      "class_diagram": "@startuml\nclass PatientCard {\n  -Patient patient\n  -VoidCallback onTap\n  -VoidCallback? onDelete\n  +build(BuildContext): Widget\n}\n@enduml",
+      "methods": [
+        {
+          "name": "build",
+          "description": "Builds the PatientCard widget, which includes a Card with the patient's name, age, gender, and contact number. It also provides an optional delete button if the onDelete callback is provided.",
+          "parameters": [
+            "BuildContext"
+          ],
+          "return_type": "Widget"
+        }
+      ],
+      "dependencies": [
+        "flutter/material.dart",
+        "my_app/core/constants/colors.dart",
+        "my_app/core/constants/text_styles.dart",
+        "my_app/models/patient.dart"
+      ]
+    },
+    {
+      "name": "lib/models/patient.dart",
+      "description": "The `Patient` class in this file represents a patient record in a healthcare application. It encapsulates the key information about a patient, including their personal details, contact information, medical history, and timestamps for when the record was created and last updated. This class serves as the central data model for managing patient data within the application.",
+      "class_diagram": "@startuml\nclass Patient {\n  -String id\n  -String name\n  -String gender\n  -DateTime dateOfBirth\n  -String contactNumber\n  -String? email\n  -String address\n  -String? bloodGroup\n  -List<String> allergies\n  -List<String> chronicConditions\n  -DateTime createdAt\n  -DateTime updatedAt\n  +int get age()\n  +factory Patient.fromJson(Map<String, dynamic> json)\n  +Map<String, dynamic> toJson()\n  +Patient copyWith({...})\n}\n@enduml",
+      "methods": [
+        {
+          "name": "get age",
+          "description": "Calculates the patient's age based on their date of birth.",
+          "parameters": null,
+          "return_type": "int"
+        },
+        {
+          "name": "fromJson",
+          "description": "Factory method that creates a `Patient` instance from a JSON map.",
+          "parameters": [
+            "Map<String, dynamic> json"
+          ],
+          "return_type": "Patient"
+        },
+        {
+          "name": "toJson",
+          "description": "Converts the `Patient` instance to a JSON map.",
+          "parameters": null,
+          "return_type": "Map<String, dynamic>"
+        },
+        {
+          "name": "copyWith",
+          "description": "Creates a new `Patient` instance with one or more fields modified.",
+          "parameters": [
+            "String? id",
+            "String? name",
+            "String? gender",
+            "DateTime? dateOfBirth",
+            "String? contactNumber",
+            "String? email",
+            "String? address",
+            "String? bloodGroup",
+            "List<String>? allergies",
+            "List<String>? chronicConditions",
+            "DateTime? createdAt",
+            "DateTime? updatedAt"
+          ],
+          "return_type": "Patient"
+        }
+      ],
+      "dependencies": [
+        "package:equatable/equatable.dart"
+      ]
+    },
+    {
+      "name": "lib/features/auth/auth_repository.dart",
+      "description": "The AuthRepository class is responsible for handling all authentication-related functionality in the application. This includes user login, registration, retrieving the current user, logging out, and resetting the password. It acts as the central point of interaction between the application's UI and the backend authentication services.",
+      "class_diagram": "@startuml\nclass AuthRepository {\n  -ApiService _apiService\n  +login(email, password): Future<Map<String, dynamic>>\n  +register(name, email, password, specialization): Future<Map<String, dynamic>>\n  +getCurrentUser(): Future<User>\n  +logout(): Future<void>\n  +requestPasswordReset(email): Future<void>\n  -_handleAuthError(error): String\n}\n@enduml",
+      "methods": [
+        {
+          "name": "login",
+          "description": "Authenticates a user by sending their email and password to the backend API and returning the response.",
+          "parameters": [
+            "email",
+            "password"
+          ],
+          "return_type": "Future<Map<String, dynamic>>"
+        },
+        {
+          "name": "register",
+          "description": "Registers a new user by sending their name, email, password, and specialization to the backend API and returning the response.",
+          "parameters": [
+            "name",
+            "email",
+            "password",
+            "specialization"
+          ],
+          "return_type": "Future<Map<String, dynamic>>"
+        },
+        {
+          "name": "getCurrentUser",
+          "description": "Retrieves the currently authenticated user's information from the backend API and returns a User object.",
+          "parameters": null,
+          "return_type": "Future<User>"
+        },
+        {
+          "name": "logout",
+          "description": "Logs out the currently authenticated user by sending a request to the backend API.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "requestPasswordReset",
+          "description": "Sends a password reset request to the backend API for the specified email address.",
+          "parameters": [
+            "email"
+          ],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "_handleAuthError",
+          "description": "Processes and returns a user-friendly error message based on the HTTP status code of the authentication-related API response.",
+          "parameters": [
+            "error"
+          ],
+          "return_type": "String"
+        }
+      ],
+      "dependencies": [
+        "my_app/models/user.dart",
+        "my_app/services/api_service.dart"
+      ]
+    },
+    {
+      "name": "lib/ui/dialogs/confirmation_dialog.dart",
+      "description": "The ConfirmationDialog widget provides a reusable dialog box that allows users to confirm or cancel an action. It is responsible for displaying a title, message, and buttons for confirmation and cancellation. The dialog can be customized with different text, colors, and callback functions for the confirm and cancel actions.",
+      "class_diagram": "@startuml\nclass ConfirmationDialog {\n  +String title\n  +String message\n  +String confirmText\n  +String cancelText\n  +VoidCallback onConfirm\n  +VoidCallback? onCancel\n  +Color? confirmColor\n  +bool isDestructive\n  +build(context): Widget\n}\n@enduml",
+      "methods": [
+        {
+          "name": "build",
+          "description": "Constructs and returns the widget tree for the confirmation dialog, including the title, message, and confirm/cancel buttons.",
+          "parameters": [
+            "context"
+          ],
+          "return_type": "Widget"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart",
+        "package:my_app/ui/widgets/custom_button.dart"
+      ]
+    },
+    {
+      "name": "lib/ui/dialogs/info_alert/info_alert_dialog_model.dart",
+      "description": "This Dart file defines the `InfoAlertDialogModel` class, which is responsible for managing the state and behavior of an information alert dialog in the application.",
+      "class_diagram": "@startuml\nclass InfoAlertDialogModel extends BaseViewModel {\n}\n@enduml",
+      "methods": [
+        {
+          "name": "InfoAlertDialogModel",
+          "description": "Constructor for the InfoAlertDialogModel class.",
+          "parameters": null,
+          "return_type": null
+        }
+      ],
+      "dependencies": [
+        "package:stacked/stacked.dart"
+      ]
+    },
+    {
+      "name": "lib/ui/bottom_sheets/filter_options_sheet.dart",
+      "description": "The `FilterOptionsSheet` class is responsible for providing a bottom sheet UI component that allows users to filter and select options from a list. It serves as a reusable widget that can be used throughout the application to handle various filtering scenarios.",
+      "class_diagram": "@startuml\n  class FilterOptionsSheet {\n    -List<String> _selectedOptions\n    +List<String> options\n    +List<String> selectedOptions\n    +String title\n    +Function(List<String>) onApply\n    +build(BuildContext): Widget\n    +initState(): void\n  }\n  @enduml",
+      "methods": [
+        {
+          "name": "build",
+          "description": "Builds the UI for the filter options bottom sheet, including a list of checkboxes for selecting options, and 'Clear All' and 'Apply' buttons.",
+          "parameters": [
+            "BuildContext"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "initState",
+          "description": "Initializes the `_selectedOptions` list with the provided `selectedOptions` data.",
+          "parameters": null,
+          "return_type": "void"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart",
+        "package:my_app/ui/widgets/custom_button.dart"
+      ]
+    },
+    {
+      "name": "lib/ui/common/ui_helpers.dart",
+      "description": "This Dart file provides a set of helper functions and widgets that are commonly used throughout the UI layer of the application. It encapsulates various utility functions and reusable UI elements to promote code reuse, consistency, and responsiveness in the application's user interface.",
+      "class_diagram": "@startuml\nclass UIHelpers {\n  + const horizontalSpaceTiny: Widget\n  + const horizontalSpaceSmall: Widget\n  + const horizontalSpaceMedium: Widget\n  + const horizontalSpaceLarge: Widget\n  + const verticalSpaceTiny: Widget\n  + const verticalSpaceSmall: Widget\n  + const verticalSpaceMedium: Widget\n  + const verticalSpaceLarge: Widget\n  + const verticalSpaceMassive: Widget\n  + const spacedDivider: Widget\n  + verticalSpace(double height): Widget\n  + screenWidth(BuildContext context): double\n  + screenHeight(BuildContext context): double\n  + screenHeightFraction(BuildContext context, {int dividedBy = 1, double offsetBy = 0, double max = 3000}): double\n  + screenWidthFraction(BuildContext context, {int dividedBy = 1, double offsetBy = 0, double max = 3000}): double\n  + halfScreenWidth(BuildContext context): double\n  + thirdScreenWidth(BuildContext context): double\n  + quarterScreenWidth(BuildContext context): double\n  + getResponsiveHorizontalSpaceMedium(BuildContext context): double\n  + getResponsiveSmallFontSize(BuildContext context): double\n  + getResponsiveMediumFontSize(BuildContext context): double\n  + getResponsiveLargeFontSize(BuildContext context): double\n  + getResponsiveExtraLargeFontSize(BuildContext context): double\n  + getResponsiveMassiveFontSize(BuildContext context): double\n  + getResponsiveFontSize(BuildContext context, {double? fontSize, double? max}): double\n}\n@enduml",
+      "methods": [
+        {
+          "name": "horizontalSpaceTiny, horizontalSpaceSmall, horizontalSpaceMedium, horizontalSpaceLarge",
+          "description": "Reusable widget constants that provide horizontal spacing of different sizes.",
+          "parameters": null,
+          "return_type": "Widget"
+        },
+        {
+          "name": "verticalSpaceTiny, verticalSpaceSmall, verticalSpaceMedium, verticalSpaceLarge, verticalSpaceMassive",
+          "description": "Reusable widget constants that provide vertical spacing of different sizes.",
+          "parameters": null,
+          "return_type": "Widget"
+        },
+        {
+          "name": "spacedDivider",
+          "description": "A reusable widget that combines a vertical space, a divider, and another vertical space.",
+          "parameters": null,
+          "return_type": "Widget"
+        },
+        {
+          "name": "verticalSpace",
+          "description": "A function that creates a vertical space of a given height.",
+          "parameters": [
+            "double height"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "screenWidth",
+          "description": "A function that returns the width of the screen.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "double"
+        },
+        {
+          "name": "screenHeight",
+          "description": "A function that returns the height of the screen.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "double"
+        },
+        {
+          "name": "screenHeightFraction",
+          "description": "A function that returns a fraction of the screen height, with optional offsets and maximum limits.",
+          "parameters": [
+            "BuildContext context",
+            "int dividedBy = 1",
+            "double offsetBy = 0",
+            "double max = 3000"
+          ],
+          "return_type": "double"
+        },
+        {
+          "name": "screenWidthFraction",
+          "description": "A function that returns a fraction of the screen width, with optional offsets and maximum limits.",
+          "parameters": [
+            "BuildContext context",
+            "int dividedBy = 1",
+            "double offsetBy = 0",
+            "double max = 3000"
+          ],
+          "return_type": "double"
+        },
+        {
+          "name": "halfScreenWidth",
+          "description": "A function that returns half the screen width.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "double"
+        },
+        {
+          "name": "thirdScreenWidth",
+          "description": "A function that returns one-third of the screen width.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "double"
+        },
+        {
+          "name": "quarterScreenWidth",
+          "description": "A function that returns one-quarter of the screen width.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "double"
+        },
+        {
+          "name": "getResponsiveHorizontalSpaceMedium",
+          "description": "A function that returns a responsive horizontal space of medium size.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "double"
+        },
+        {
+          "name": "getResponsiveSmallFontSize",
+          "description": "A function that returns a responsive font size of small size.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "double"
+        },
+        {
+          "name": "getResponsiveMediumFontSize",
+          "description": "A function that returns a responsive font size of medium size.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "double"
+        },
+        {
+          "name": "getResponsiveLargeFontSize",
+          "description": "A function that returns a responsive font size of large size.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "double"
+        },
+        {
+          "name": "getResponsiveExtraLargeFontSize",
+          "description": "A function that returns a responsive font size of extra-large size.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "double"
+        },
+        {
+          "name": "getResponsiveMassiveFontSize",
+          "description": "A function that returns a responsive font size of massive size.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "double"
+        },
+        {
+          "name": "getResponsiveFontSize",
+          "description": "A generic function that returns a responsive font size based on the screen width.",
+          "parameters": [
+            "BuildContext context",
+            "double? fontSize",
+            "double? max"
+          ],
+          "return_type": "double"
+        }
+      ],
+      "dependencies": [
+        "dart:math",
+        "package:flutter/material.dart"
+      ]
+    },
+    {
+      "name": "lib/ui/dialogs/info_alert/info_alert_dialog.dart",
+      "description": "This file contains the implementation of an InfoAlertDialog, which is a reusable UI component that displays an informative alert dialog with a title, description, and a graphic icon. The primary purpose of this dialog is to provide users with important information or notifications within the application.",
+      "class_diagram": "@startuml\n  class InfoAlertDialog {\n    - request: DialogRequest\n    - completer: Function(DialogResponse)\n    + builder(context, viewModel, child): Widget\n    + viewModelBuilder(context): InfoAlertDialogModel\n  }\n  class InfoAlertDialogModel {\n  }\n  @enduml",
+      "methods": [
+        {
+          "name": "builder",
+          "description": "This method is responsible for building the UI of the InfoAlertDialog. It takes the DialogRequest, which contains the title and description to be displayed, and renders the dialog with a custom graphic and a 'Got it' button to dismiss the dialog.",
+          "parameters": [
+            "BuildContext",
+            "InfoAlertDialogModel",
+            "Widget"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "viewModelBuilder",
+          "description": "This method creates an instance of the InfoAlertDialogModel, which is the view model for the InfoAlertDialog. The view model likely contains the logic to handle any additional functionality or state required by the dialog.",
+          "parameters": [
+            "BuildContext"
+          ],
+          "return_type": "InfoAlertDialogModel"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:stacked/stacked.dart",
+        "package:stacked_services/stacked_services.dart",
+        "package:my_app/ui/common/app_colors.dart",
+        "package:my_app/ui/common/ui_helpers.dart",
+        "package:my_app/ui/dialogs/info_alert/info_alert_dialog_model.dart"
+      ]
+    },
+    {
+      "name": "lib/core/constants/text_styles.dart",
+      "description": "This Dart file defines a set of reusable text styles for the application. It provides a centralized location to manage and apply consistent typographic styles across the entire UI.",
+      "class_diagram": "@startuml\nclass TextStyles {\n  + static h1: TextStyle\n  + static h2: TextStyle\n  + static h3: TextStyle\n  + static h4: TextStyle\n  + static body1: TextStyle\n  + static body2: TextStyle\n  + static caption: TextStyle\n  + static button: TextStyle\n  + static link: TextStyle\n  + static label: TextStyle\n  + static error: TextStyle\n  + static success: TextStyle\n}\n@enduml",
+      "methods": [
+        {
+          "name": "TextStyles",
+          "description": "This is a utility class that provides a set of reusable text style definitions.",
+          "parameters": null,
+          "return_type": null
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:my_app/core/constants/colors.dart"
+      ]
+    },
+    {
+      "name": "lib/ui/widgets/custom_app_bar.dart",
+      "description": "This file defines a custom AppBar widget that provides a consistent and configurable header for the application's user interface. It abstracts away the common AppBar functionality and allows for easy customization of the title, actions, leading widget, and other appearance-related properties.",
+      "class_diagram": "@startuml\nclass CustomAppBar implements PreferredSizeWidget {\n  - String title\n  - List<Widget>? actions\n  - Widget? leading\n  - bool centerTitle\n  - Color? backgroundColor\n  - bool showBackButton\n  - VoidCallback? onBackPressed\n  + Widget build(BuildContext context)\n  + Size get preferredSize\n}\n@enduml",
+      "methods": [
+        {
+          "name": "build",
+          "description": "Builds the CustomAppBar widget based on the provided configuration options.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "preferredSize",
+          "description": "Provides the preferred size of the CustomAppBar widget, which is the standard toolbar height.",
+          "parameters": [],
+          "return_type": "Size"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart"
+      ]
+    },
+    {
+      "name": "lib/services/api_service.dart",
+      "description": "The `ApiService` class in this file is responsible for handling all API requests to the application's backend. It provides a consistent and reliable interface for making HTTP requests, managing authentication tokens, and handling response data and errors.",
+      "class_diagram": "@startuml\nclass ApiService {\n  -String baseUrl\n  -Map<String, String> _headers\n  +void setAuthToken(String token)\n  +void removeAuthToken()\n  +Future<Map<String, dynamic>> get(String endpoint)\n  +Future<Map<String, dynamic>> post(String endpoint, Map<String, dynamic> body)\n  +Future<Map<String, dynamic>> put(String endpoint, Map<String, dynamic> body)\n  +Future<Map<String, dynamic>> delete(String endpoint)\n  -Map<String, dynamic> _handleResponse(http.Response response)\n  -String _handleError(dynamic error)\n}\n\nclass HttpException {\n  -String message\n  -int statusCode\n}\n@enduml",
+      "methods": [
+        {
+          "name": "setAuthToken",
+          "description": "Sets the authorization token in the request headers. This is used for authenticated API endpoints.",
+          "parameters": [
+            "String token"
+          ],
+          "return_type": "void"
+        },
+        {
+          "name": "removeAuthToken",
+          "description": "Removes the authorization token from the request headers.",
+          "parameters": null,
+          "return_type": "void"
+        },
+        {
+          "name": "get",
+          "description": "Sends a GET request to the specified API endpoint and returns the response data as a map.",
+          "parameters": [
+            "String endpoint"
+          ],
+          "return_type": "Future<Map<String, dynamic>>"
+        },
+        {
+          "name": "post",
+          "description": "Sends a POST request to the specified API endpoint with the given request body and returns the response data as a map.",
+          "parameters": [
+            "String endpoint",
+            "Map<String, dynamic> body"
+          ],
+          "return_type": "Future<Map<String, dynamic>>"
+        },
+        {
+          "name": "put",
+          "description": "Sends a PUT request to the specified API endpoint with the given request body and returns the response data as a map.",
+          "parameters": [
+            "String endpoint",
+            "Map<String, dynamic> body"
+          ],
+          "return_type": "Future<Map<String, dynamic>>"
+        },
+        {
+          "name": "delete",
+          "description": "Sends a DELETE request to the specified API endpoint and returns the response data as a map.",
+          "parameters": [
+            "String endpoint"
+          ],
+          "return_type": "Future<Map<String, dynamic>>"
+        },
+        {
+          "name": "_handleResponse",
+          "description": "Handles the response from the API and returns the data as a map, or throws an exception if the response is not successful.",
+          "parameters": [
+            "http.Response response"
+          ],
+          "return_type": "Map<String, dynamic>"
+        },
+        {
+          "name": "_handleError",
+          "description": "Handles errors that occur during the API request and returns an appropriate error message.",
+          "parameters": [
+            "dynamic error"
+          ],
+          "return_type": "String"
+        }
+      ],
+      "dependencies": [
+        "dart:convert",
+        "package:flutter/foundation.dart",
+        "package:http/http.dart",
+        "package:stacked/stacked.dart"
+      ]
+    },
+    {
+      "name": "lib/ui/widgets/custom_text_field.dart",
+      "description": "This Dart file provides a custom TextField widget that extends the functionality of the Flutter TextFormField. It offers a set of configurable properties and features to create a consistent and reusable text input field across the application.",
+      "class_diagram": "@startuml\nclass CustomTextField extends StatefulWidget {\n  -String? label\n  -String? hint\n  -String? errorText\n  -TextEditingController? controller\n  -bool obscureText\n  -TextInputType keyboardType\n  -TextInputAction textInputAction\n  -ValueChanged<String>? onChanged\n  -VoidCallback? onTap\n  -bool readOnly\n  -int? maxLines\n  -int? maxLength\n  -List<TextInputFormatter>? inputFormatters\n  -Widget? prefix\n  -Widget? suffix\n  -bool autofocus\n  -String? Function(String?)? validator\n  -FocusNode? focusNode\n  +State<CustomTextField> createState()\n}\n\nclass _CustomTextFieldState extends State<CustomTextField> {\n  -late bool _obscureText\n  +Widget build(BuildContext context)\n}\n@enduml",
+      "methods": [
+        {
+          "name": "CustomTextField",
+          "description": "The constructor for the CustomTextField widget, which allows configuring various properties such as label, hint, error text, controller, obscure text, keyboard type, input formatters, and more.",
+          "parameters": [
+            "label",
+            "hint",
+            "errorText",
+            "controller",
+            "obscureText",
+            "keyboardType",
+            "textInputAction",
+            "onChanged",
+            "onTap",
+            "readOnly",
+            "maxLines",
+            "maxLength",
+            "inputFormatters",
+            "prefix",
+            "suffix",
+            "autofocus",
+            "validator",
+            "focusNode"
+          ],
+          "return_type": null
+        },
+        {
+          "name": "build",
+          "description": "The build method that constructs the UI for the CustomTextField widget, including the label, the TextFormField, and any prefix/suffix icons.",
+          "parameters": [
+            "context"
+          ],
+          "return_type": "Widget"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:flutter/services.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart"
+      ]
+    },
+    {
+      "name": "lib/ui/widgets/custom_button.dart",
+      "description": "This file defines a custom button widget that provides a reusable and configurable button component for the application's user interface. It supports various button styles, loading states, and other customization options to meet the design and functional requirements of the app.",
+      "class_diagram": "@startuml\nclass CustomButton extends StatelessWidget {\n  + String text\n  + VoidCallback onPressed\n  + bool isLoading\n  + bool isOutlined\n  + IconData? icon\n  + Color? backgroundColor\n  + Color? textColor\n  + double? width\n  + double height\n  + double borderRadius\n  + build(BuildContext context): Widget\n}\n@enduml",
+      "methods": [
+        {
+          "name": "build",
+          "description": "Builds the custom button widget based on the provided configuration options.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "Widget"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart"
+      ]
+    },
+    {
+      "name": "lib/ui/widgets/loading_indicator.dart",
+      "description": "The `LoadingIndicator` widget is responsible for displaying a loading spinner or progress indicator to the user, along with an optional message. It is primarily used to provide visual feedback to the user while the application is performing a long-running operation, such as fetching data from an API or processing a request.",
+      "class_diagram": "@startuml\nclass LoadingIndicator {\n  - double size\n  - Color? color\n  - double strokeWidth\n  - String? message\n  + Widget build(BuildContext)\n}\n@enduml",
+      "methods": [
+        {
+          "name": "build",
+          "description": "Builds the `LoadingIndicator` widget, which consists of a centered column containing a circular progress indicator and an optional message.",
+          "parameters": [
+            "BuildContext"
+          ],
+          "return_type": "Widget"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:my_app/core/constants/colors.dart"
+      ]
+    },
+    {
+      "name": "lib/features/patients/patients_repository.dart",
+      "description": "The PatientsRepository class is responsible for managing patient data in the application. It provides a centralized interface for interacting with the API service to perform CRUD (Create, Read, Update, Delete) operations on patient records. The primary purpose of this class is to encapsulate the logic for fetching, storing, and manipulating patient data, making it easily accessible to other parts of the application.",
+      "class_diagram": "@startuml\nclass PatientsRepository {\n  -ApiService _apiService\n  +getPatients(): Future<List<Patient>>\n  +getPatientById(String id): Future<Patient>\n  +createPatient(Map<String, dynamic> patientData): Future<Patient>\n  +updatePatient(String id, Map<String, dynamic> patientData): Future<Patient>\n  +deletePatient(String id): Future<void>\n  -_handlePatientError(dynamic error): String\n}\n@enduml",
+      "methods": [
+        {
+          "name": "getPatients",
+          "description": "Retrieves a list of all patients from the API service.",
+          "parameters": null,
+          "return_type": "Future<List<Patient>>"
+        },
+        {
+          "name": "getPatientById",
+          "description": "Retrieves a single patient from the API service by their ID.",
+          "parameters": [
+            "String id"
+          ],
+          "return_type": "Future<Patient>"
+        },
+        {
+          "name": "createPatient",
+          "description": "Creates a new patient in the API service using the provided patient data.",
+          "parameters": [
+            "Map<String, dynamic> patientData"
+          ],
+          "return_type": "Future<Patient>"
+        },
+        {
+          "name": "updatePatient",
+          "description": "Updates an existing patient in the API service using the provided patient ID and data.",
+          "parameters": [
+            "String id",
+            "Map<String, dynamic> patientData"
+          ],
+          "return_type": "Future<Patient>"
+        },
+        {
+          "name": "deletePatient",
+          "description": "Deletes a patient from the API service by their ID.",
+          "parameters": [
+            "String id"
+          ],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "_handlePatientError",
+          "description": "Processes and returns an appropriate error message based on the API response status code.",
+          "parameters": [
+            "dynamic error"
+          ],
+          "return_type": "String"
+        }
+      ],
+      "dependencies": [
+        "my_app/models/patient.dart",
+        "my_app/services/api_service.dart"
+      ]
+    },
+    {
+      "name": "lib/ui/bottom_sheets/notice/notice_sheet_model.dart",
+      "description": "The `NoticeSheetModel` class is responsible for managing the state and behavior of the notice sheet UI component in the application. It provides the necessary functionality and data to display the notice sheet to the user.",
+      "class_diagram": "@startuml\nclass NoticeSheetModel {\n}\nNoticeSheetModel -|> BaseViewModel\n@enduml",
+      "methods": [],
+      "dependencies": [
+        "package:stacked/stacked.dart"
+      ]
+    },
+    {
+      "name": "lib/features/dashboard/dashboard_view.dart",
+      "description": "The `DashboardView` class is responsible for rendering the main dashboard screen of the application. It displays key metrics and recent consultations, allowing users to refresh the data and view details of individual consultations.",
+      "class_diagram": "@startuml\nclass DashboardView {\n  +builder(BuildContext, DashboardViewModel, Widget?): Widget\n  +viewModelBuilder(BuildContext): DashboardViewModel\n  +onViewModelReady(DashboardViewModel): void\n}\n\nDashboardView o-- DashboardViewModel\nDashboardView --o Scaffold\nDashboardView --o RefreshIndicator\nDashboardView --o ListView\nDashboardView --o GridView\nDashboardView --o StatsCard\nDashboardView --o CustomAppBar\nDashboardView --o LoadingIndicator\n@enduml",
+      "methods": [
+        {
+          "name": "builder",
+          "description": "Builds the main UI of the dashboard view, displaying key metrics, recent consultations, and handling the loading and error states.",
+          "parameters": [
+            "BuildContext",
+            "DashboardViewModel",
+            "Widget?"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "viewModelBuilder",
+          "description": "Provides the `DashboardViewModel` instance to the `StackedView` parent class.",
+          "parameters": [
+            "BuildContext"
+          ],
+          "return_type": "DashboardViewModel"
+        },
+        {
+          "name": "onViewModelReady",
+          "description": "Initializes the `DashboardViewModel` when the view is ready.",
+          "parameters": [
+            "DashboardViewModel"
+          ],
+          "return_type": "void"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:stacked/stacked.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart",
+        "package:my_app/features/dashboard/dashboard_viewmodel.dart",
+        "package:my_app/features/dashboard/widgets/stats_card.dart",
+        "package:my_app/ui/widgets/custom_app_bar.dart",
+        "package:my_app/ui/widgets/loading_indicator.dart"
+      ]
+    },
+    {
+      "name": "lib/services/consultation_service.dart",
+      "description": "The ConsultationService is responsible for managing the lifecycle of medical consultations, including creating, retrieving, and deleting consultations, as well as adding diagnoses to existing consultations. This service acts as the central point of access for all consultation-related operations, abstracting away the underlying data storage and repository logic.",
+      "class_diagram": "@startuml\nclass ConsultationService {\n  - ConsultationRepository _repository\n  + Future<List<Consultation>> getConsultations()\n  + Future<Consultation> getConsultationById(String id)\n  + Future<Consultation> createConsultation(patientId, chiefComplaint, symptoms, notes, followUpDate)\n  + Future<Diagnosis> addDiagnosis(consultationId, condition, description, symptoms, treatments, medications, notes)\n  + Future<void> deleteConsultation(String id)\n}\n@enduml",
+      "methods": [
+        {
+          "name": "getConsultations",
+          "description": "Retrieves a list of all consultations.",
+          "parameters": null,
+          "return_type": "Future<List<Consultation>>"
+        },
+        {
+          "name": "getConsultationById",
+          "description": "Retrieves a specific consultation by its ID.",
+          "parameters": [
+            "String id"
+          ],
+          "return_type": "Future<Consultation>"
+        },
+        {
+          "name": "createConsultation",
+          "description": "Creates a new consultation with the provided details.",
+          "parameters": [
+            "String patientId",
+            "String chiefComplaint",
+            "List<String> symptoms",
+            "String notes",
+            "DateTime? followUpDate"
+          ],
+          "return_type": "Future<Consultation>"
+        },
+        {
+          "name": "addDiagnosis",
+          "description": "Adds a new diagnosis to an existing consultation.",
+          "parameters": [
+            "String consultationId",
+            "String condition",
+            "String description",
+            "List<String> symptoms",
+            "List<String> treatments",
+            "List<String> medications",
+            "String notes"
+          ],
+          "return_type": "Future<Diagnosis>"
+        },
+        {
+          "name": "deleteConsultation",
+          "description": "Deletes a specific consultation by its ID.",
+          "parameters": [
+            "String id"
+          ],
+          "return_type": "Future<void>"
+        }
+      ],
+      "dependencies": [
+        "package:stacked/stacked.dart",
+        "package:my_app/models/consultation.dart",
+        "package:my_app/models/diagnosis.dart",
+        "package:my_app/features/consultation/consultation_repository.dart"
+      ]
+    },
+    {
+      "name": "lib/core/theme/app_theme.dart",
+      "description": "This file defines the main application theme, including the color scheme, typography, button styles, and other UI elements. It provides a consistent and cohesive visual identity for the app.",
+      "class_diagram": "@startuml\nclass AppTheme {\n    + static ThemeData get lightTheme\n}\n@enduml",
+      "methods": [
+        {
+          "name": "get lightTheme",
+          "description": "Defines the light theme for the application, including the color scheme, typography, button styles, and other UI elements.",
+          "parameters": null,
+          "return_type": "ThemeData"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart"
+      ]
+    },
+    {
+      "name": "lib/services/storage_service.dart",
+      "description": "The StorageService class is responsible for managing the application's local data storage using the shared_preferences package. It provides a consistent interface for storing and retrieving key-value pairs, such as the user's authentication token and user data, in the device's persistent storage.",
+      "class_diagram": "@startuml\nclass StorageService {\n  - static String _authTokenKey\n  - static String _userDataKey\n  - late SharedPreferences _prefs\n\n  + Future<void> init()\n  + Future<void> setAuthToken(String token)\n  + Future<String?> getAuthToken()\n  + Future<void> removeAuthToken()\n  + Future<void> setUserData(String userData)\n  + Future<String?> getUserData()\n  + Future<void> removeUserData()\n  + Future<void> clearAll()\n}\n\nStorageService o-- SharedPreferences\n@enduml",
+      "methods": [
+        {
+          "name": "init",
+          "description": "Initializes the SharedPreferences instance, which is used for all storage operations.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "setAuthToken",
+          "description": "Stores the user's authentication token in the device's persistent storage.",
+          "parameters": [
+            "token"
+          ],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "getAuthToken",
+          "description": "Retrieves the user's authentication token from the device's persistent storage.",
+          "parameters": null,
+          "return_type": "Future<String?>"
+        },
+        {
+          "name": "removeAuthToken",
+          "description": "Removes the user's authentication token from the device's persistent storage.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "setUserData",
+          "description": "Stores the user's data in the device's persistent storage.",
+          "parameters": [
+            "userData"
+          ],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "getUserData",
+          "description": "Retrieves the user's data from the device's persistent storage.",
+          "parameters": null,
+          "return_type": "Future<String?>"
+        },
+        {
+          "name": "removeUserData",
+          "description": "Removes the user's data from the device's persistent storage.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "clearAll",
+          "description": "Clears all data stored in the device's persistent storage.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        }
+      ],
+      "dependencies": [
+        "package:shared_preferences/shared_preferences.dart",
+        "package:stacked/stacked.dart"
+      ]
+    },
+    {
+      "name": "lib/ui/common/app_colors.dart",
+      "description": "This file defines a set of app-wide color constants used throughout the Flutter application's UI. It provides a centralized location to manage and consistently apply the application's color palette.",
+      "class_diagram": "",
+      "methods": [],
+      "dependencies": [
+        "package:flutter/material.dart"
+      ]
+    },
+    {
+      "name": "lib/services/authentication_service.dart",
+      "description": "The AuthenticationService is responsible for handling user authentication and authorization in the application. It provides methods for logging in, registering, logging out, and resetting passwords. The service manages the current user's state and ensures that the user's authentication token is properly stored and used for API requests.",
+      "class_diagram": "@startuml\nclass AuthenticationService {\n  - ApiService _apiService\n  - StorageService _storageService\n  - User? _currentUser\n  + User? get currentUser\n  + bool get isAuthenticated\n  + Future<void> init()\n  + Future<User> login(String email, String password)\n  + Future<User> register(String name, String email, String password, String specialization)\n  + Future<void> logout()\n  + Future<void> resetPassword(String email)\n  - String _handleAuthError(dynamic error)\n}\n\nAuthenticationService -down-> ApiService\nAuthenticationService -down-> StorageService\nAuthenticationService -down-> User\n@enduml",
+      "methods": [
+        {
+          "name": "init",
+          "description": "Initializes the AuthenticationService by loading the user's authentication token from storage and fetching the user's data from the API if the token is valid.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "login",
+          "description": "Logs in the user with the provided email and password, and stores the authentication token and user data.",
+          "parameters": [
+            "String email",
+            "String password"
+          ],
+          "return_type": "Future<User>"
+        },
+        {
+          "name": "register",
+          "description": "Registers a new user with the provided name, email, password, and specialization, and stores the authentication token and user data.",
+          "parameters": [
+            "String name",
+            "String email",
+            "String password",
+            "String specialization"
+          ],
+          "return_type": "Future<User>"
+        },
+        {
+          "name": "logout",
+          "description": "Logs out the current user by removing the authentication token and clearing the current user data.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "resetPassword",
+          "description": "Sends a password reset request to the API for the provided email address.",
+          "parameters": [
+            "String email"
+          ],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "_handleAuthError",
+          "description": "Handles authentication-related errors by returning appropriate error messages based on the API response status code.",
+          "parameters": [
+            "dynamic error"
+          ],
+          "return_type": "String"
+        }
+      ],
+      "dependencies": [
+        "package:stacked/stacked.dart",
+        "package:my_app/models/user.dart",
+        "package:my_app/services/api_service.dart",
+        "package:my_app/services/storage_service.dart"
+      ]
+    },
+    {
+      "name": "lib/features/consultation/consultation_viewmodel.dart",
+      "description": "This Dart file defines the ConsultationViewModel, which is responsible for managing the state and functionality related to patient consultations in the application. It provides the core business logic for handling consultations, including fetching, creating, updating, and deleting consultations, as well as adding diagnoses to a consultation.",
+      "class_diagram": "@startuml\nclass ConsultationViewModel {\n  - ConsultationService _consultationService\n  - NavigationService _navigationService\n  - DialogService _dialogService\n  - List<Consultation> _consultations\n  - Consultation? _selectedConsultation\n  - String? _modelError\n\n  + List<Consultation> get consultations\n  + Consultation? get selectedConsultation\n  + String? get modelError\n\n  + Future<void> initialize()\n  + Future<void> loadConsultations()\n  + Future<void> selectConsultation(String id)\n  + Future<bool> createConsultation(...)\n  + Future<bool> addDiagnosis(...)\n  + Future<void> deleteConsultation(String id)\n}\n@enduml",
+      "methods": [
+        {
+          "name": "initialize",
+          "description": "Initializes the view model by loading the consultations.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "loadConsultations",
+          "description": "Fetches the list of consultations from the ConsultationService and updates the view model's state.",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "selectConsultation",
+          "description": "Fetches a specific consultation from the ConsultationService and updates the view model's selected consultation.",
+          "parameters": [
+            "String id"
+          ],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "createConsultation",
+          "description": "Creates a new consultation in the ConsultationService and adds it to the view model's consultations list.",
+          "parameters": [
+            "String patientId",
+            "String chiefComplaint",
+            "List<String> symptoms",
+            "String notes",
+            "DateTime? followUpDate"
+          ],
+          "return_type": "Future<bool>"
+        },
+        {
+          "name": "addDiagnosis",
+          "description": "Adds a new diagnosis to the selected consultation in the ConsultationService and updates the view model's state.",
+          "parameters": [
+            "String consultationId",
+            "String condition",
+            "String description",
+            "List<String> symptoms",
+            "List<String> treatments",
+            "List<String> medications",
+            "String notes"
+          ],
+          "return_type": "Future<bool>"
+        },
+        {
+          "name": "deleteConsultation",
+          "description": "Deletes a consultation from the ConsultationService and removes it from the view model's consultations list.",
+          "parameters": [
+            "String id"
+          ],
+          "return_type": "Future<void>"
+        }
+      ],
+      "dependencies": [
+        "stacked/stacked.dart",
+        "my_app/models/consultation.dart",
+        "my_app/models/diagnosis.dart",
+        "my_app/services/consultation_service.dart",
+        "stacked_services/stacked_services.dart"
+      ]
+    },
+    {
+      "name": "lib/features/consultation/consultation_repository.dart",
+      "description": "The `ConsultationRepository` class is responsible for managing the data and interactions related to patient consultations in a healthcare application. It provides an abstraction layer over the underlying API service, handling the fetching, creation, updating, and deletion of consultation records, as well as the management of associated diagnoses.",
+      "class_diagram": "@startuml\nclass ConsultationRepository {\n  -_apiService: ApiService\n  +getConsultations(): Future<List<Consultation>>\n  +getConsultationById(String id): Future<Consultation>\n  +createConsultation(Map<String, dynamic> data): Future<Consultation>\n  +updateConsultation(String id, Map<String, dynamic> data): Future<Consultation>\n  +addDiagnosis(String consultationId, Map<String, dynamic> diagnosisData): Future<Diagnosis>\n  +deleteConsultation(String id): Future<void>\n  -_handleConsultationError(dynamic error): String\n}\n@enduml",
+      "methods": [
+        {
+          "name": "getConsultations",
+          "description": "Fetches a list of all consultations from the API.",
+          "parameters": [
+            ""
+          ],
+          "return_type": "Future<List<Consultation>>"
+        },
+        {
+          "name": "getConsultationById",
+          "description": "Fetches a specific consultation record by its ID.",
+          "parameters": [
+            "String id"
+          ],
+          "return_type": "Future<Consultation>"
+        },
+        {
+          "name": "createConsultation",
+          "description": "Creates a new consultation record with the provided data.",
+          "parameters": [
+            "Map<String, dynamic> data"
+          ],
+          "return_type": "Future<Consultation>"
+        },
+        {
+          "name": "updateConsultation",
+          "description": "Updates an existing consultation record with the provided data.",
+          "parameters": [
+            "String id",
+            "Map<String, dynamic> data"
+          ],
+          "return_type": "Future<Consultation>"
+        },
+        {
+          "name": "addDiagnosis",
+          "description": "Adds a new diagnosis to the specified consultation record.",
+          "parameters": [
+            "String consultationId",
+            "Map<String, dynamic> diagnosisData"
+          ],
+          "return_type": "Future<Diagnosis>"
+        },
+        {
+          "name": "deleteConsultation",
+          "description": "Deletes the specified consultation record.",
+          "parameters": [
+            "String id"
+          ],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "_handleConsultationError",
+          "description": "Handles errors that occur during consultation-related operations and provides appropriate error messages.",
+          "parameters": [
+            "dynamic error"
+          ],
+          "return_type": "String"
+        }
+      ],
+      "dependencies": [
+        "my_app/models/consultation.dart",
+        "my_app/models/diagnosis.dart",
+        "my_app/services/api_service.dart"
+      ]
+    },
+    {
+      "name": "lib/features/consultation/consultation_view.dart",
+      "description": "The ConsultationView class is responsible for displaying the details of a patient consultation, including the chief complaint, symptoms, diagnoses, and related information. It allows the user to view, manage, and update the consultation details, as well as add new diagnoses.",
+      "class_diagram": "@startuml\nclass ConsultationView {\n  + builder(BuildContext context, ConsultationViewModel model, Widget? child): Widget\n  + _buildConsultationHeader(ConsultationViewModel model): Widget\n  + _buildDiagnosisSection(ConsultationViewModel model): Widget\n  + _buildDiagnosisDetail(String title, List<String> items): Widget\n  + _showAddDiagnosisBottomSheet(BuildContext context, ConsultationViewModel model): void\n  + viewModelBuilder(BuildContext context): ConsultationViewModel\n  + onViewModelReady(ConsultationViewModel model): void\n}\n\nclass ConsultationViewModel {\n  + selectConsultation(String consultationId): Future<void>\n  + deleteConsultation(String consultationId): Future<void>\n}\n\nConsultationView --> ConsultationViewModel\n@enduml",
+      "methods": [
+        {
+          "name": "builder",
+          "description": "Builds the UI for the ConsultationView, including the app bar, loading indicator, and the main content area.",
+          "parameters": [
+            "BuildContext context",
+            "ConsultationViewModel model",
+            "Widget? child"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "_buildConsultationHeader",
+          "description": "Builds the header section of the ConsultationView, displaying the chief complaint, symptoms, and notes.",
+          "parameters": [
+            "ConsultationViewModel model"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "_buildDiagnosisSection",
+          "description": "Builds the section of the ConsultationView that displays the list of diagnoses for the selected consultation.",
+          "parameters": [
+            "ConsultationViewModel model"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "_buildDiagnosisDetail",
+          "description": "Builds the UI for displaying the details of a single diagnosis, including the treatments, medications, and notes.",
+          "parameters": [
+            "String title",
+            "List<String> items"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "_showAddDiagnosisBottomSheet",
+          "description": "Shows a bottom sheet that allows the user to add a new diagnosis to the selected consultation.",
+          "parameters": [
+            "BuildContext context",
+            "ConsultationViewModel model"
+          ],
+          "return_type": "void"
+        },
+        {
+          "name": "viewModelBuilder",
+          "description": "Provides an instance of the ConsultationViewModel to the ConsultationView.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "ConsultationViewModel"
+        },
+        {
+          "name": "onViewModelReady",
+          "description": "Selects the consultation to be displayed when the ConsultationView is ready.",
+          "parameters": [
+            "ConsultationViewModel model"
+          ],
+          "return_type": "void"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:stacked/stacked.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart",
+        "package:my_app/features/consultation/consultation_viewmodel.dart",
+        "package:my_app/ui/widgets/custom_app_bar.dart",
+        "package:my_app/ui/widgets/loading_indicator.dart",
+        "package:my_app/ui/widgets/custom_button.dart"
+      ]
+    },
+    {
+      "name": "lib/models/consultation.dart",
+      "description": "The Consultation class represents a medical consultation between a patient and a doctor. It encapsulates the key details of the consultation, including the patient and doctor IDs, the consultation date, the chief complaint, symptoms, diagnoses, and follow-up information. This class is a central part of the application's domain model, providing a structured way to manage and persist consultation data.",
+      "class_diagram": "@startuml\nclass Consultation {\n  -String id\n  -String patientId\n  -String doctorId\n  -DateTime consultationDate\n  -String chiefComplaint\n  -List<String> symptoms\n  -String? notes\n  -List<Diagnosis> diagnoses\n  -String status\n  -DateTime? followUpDate\n  -DateTime createdAt\n  -DateTime updatedAt\n\n  +Consultation({...})\n  +factory Consultation.fromJson(Map<String, dynamic> json)\n  +Map<String, dynamic> toJson()\n  +Consultation copyWith({...})\n}\n@enduml",
+      "methods": [
+        {
+          "name": "Consultation",
+          "description": "Constructor that initializes the consultation object with the provided data.",
+          "parameters": [
+            "id",
+            "patientId",
+            "doctorId",
+            "consultationDate",
+            "chiefComplaint",
+            "symptoms",
+            "notes",
+            "diagnoses",
+            "status",
+            "followUpDate",
+            "createdAt",
+            "updatedAt"
+          ],
+          "return_type": null
+        },
+        {
+          "name": "Consultation.fromJson",
+          "description": "Factory constructor that creates a Consultation instance from a JSON map.",
+          "parameters": [
+            "Map<String, dynamic> json"
+          ],
+          "return_type": "Consultation"
+        },
+        {
+          "name": "toJson",
+          "description": "Converts the Consultation instance to a JSON map.",
+          "parameters": null,
+          "return_type": "Map<String, dynamic>"
+        },
+        {
+          "name": "copyWith",
+          "description": "Creates a new Consultation instance with the provided updated properties.",
+          "parameters": [
+            "id",
+            "patientId",
+            "doctorId",
+            "consultationDate",
+            "chiefComplaint",
+            "symptoms",
+            "notes",
+            "diagnoses",
+            "status",
+            "followUpDate",
+            "createdAt",
+            "updatedAt"
+          ],
+          "return_type": "Consultation"
+        }
+      ],
+      "dependencies": [
+        "package:equatable/equatable.dart",
+        "package:my_app/models/diagnosis.dart"
+      ]
+    },
+    {
+      "name": "lib/features/consultation/widgets/consultation_form.dart",
+      "description": "The ConsultationForm widget is responsible for rendering a form that allows users to input details about a medical consultation, including the chief complaint, symptoms, notes, and a follow-up date. This form is a key component in the application's consultation management functionality, enabling healthcare providers to efficiently capture and record patient consultation information.",
+      "class_diagram": "@startuml\n  class ConsultationForm extends StatefulWidget {\n    +final Function(Map<String, dynamic>) onSubmit\n    +final bool isLoading\n    +State<ConsultationForm> createState()\n  }\n\n  class _ConsultationFormState extends State<ConsultationForm> {\n    -final _formKey = GlobalKey<FormState>()\n    -final _chiefComplaintController = TextEditingController()\n    -final _notesController = TextEditingController()\n    -final _newSymptomController = TextEditingController()\n    -final List<String> _symptoms = []\n    -DateTime? _followUpDate\n\n    -void _addSymptom(String symptom)\n    -void _removeSymptom(String symptom)\n    -Future<void> _selectFollowUpDate()\n    +Widget build(BuildContext context)\n    +void dispose()\n  }\n  @enduml",
+      "methods": [
+        {
+          "name": "_addSymptom",
+          "description": "Adds a new symptom to the list of symptoms, if it doesn't already exist.",
+          "parameters": [
+            "String symptom"
+          ],
+          "return_type": "void"
+        },
+        {
+          "name": "_removeSymptom",
+          "description": "Removes a symptom from the list of symptoms.",
+          "parameters": [
+            "String symptom"
+          ],
+          "return_type": "void"
+        },
+        {
+          "name": "_selectFollowUpDate",
+          "description": "Opens a date picker to allow the user to select a follow-up date.",
+          "parameters": [],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "build",
+          "description": "Builds the ConsultationForm widget, which includes various input fields, a list of symptoms, and a button to submit the form.",
+          "parameters": [
+            "BuildContext context"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "dispose",
+          "description": "Disposes of the text editing controllers used in the form.",
+          "parameters": [],
+          "return_type": "void"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:my_app/core/constants/colors.dart",
+        "package:my_app/core/constants/text_styles.dart",
+        "package:my_app/ui/widgets/custom_text_field.dart",
+        "package:my_app/ui/widgets/custom_button.dart"
+      ]
+    },
+    {
+      "name": "lib/features/auth/auth_viewmodel.dart",
+      "description": "The AuthViewModel class is responsible for handling the authentication-related functionality of the application. It provides methods for login, registration, and logout, and manages the state and validation of user input.",
+      "class_diagram": "@startuml\nclass AuthViewModel {\n  - _authService: AuthenticationService\n  - _navigationService: NavigationService\n  - _dialogService: DialogService\n  - _email: String\n  - _password: String\n  - _name: String\n  - _specialization: String\n  - _modelError: String?\n\n  + email: String\n  + password: String\n  + name: String\n  + specialization: String\n  + modelError: String?\n\n  + setEmail(String value)\n  + setPassword(String value)\n  + setName(String value)\n  + setSpecialization(String value)\n  + login()\n  + register()\n  + logout()\n  + navigateToRegister()\n  + navigateToLogin()\n}\n@enduml",
+      "methods": [
+        {
+          "name": "setEmail",
+          "description": "Sets the email value and clears any previous model error",
+          "parameters": [
+            "value: String"
+          ],
+          "return_type": "void"
+        },
+        {
+          "name": "setPassword",
+          "description": "Sets the password value and clears any previous model error",
+          "parameters": [
+            "value: String"
+          ],
+          "return_type": "void"
+        },
+        {
+          "name": "setName",
+          "description": "Sets the name value and clears any previous model error",
+          "parameters": [
+            "value: String"
+          ],
+          "return_type": "void"
+        },
+        {
+          "name": "setSpecialization",
+          "description": "Sets the specialization value and clears any previous model error",
+          "parameters": [
+            "value: String"
+          ],
+          "return_type": "void"
+        },
+        {
+          "name": "login",
+          "description": "Logs the user in by validating the input, calling the AuthenticationService to perform the login, and navigating to the dashboard view if successful",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "register",
+          "description": "Registers a new user by validating the input, calling the AuthenticationService to perform the registration, and navigating to the dashboard view if successful",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "logout",
+          "description": "Logs the user out by calling the AuthenticationService to perform the logout and navigating to the login view",
+          "parameters": null,
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "navigateToRegister",
+          "description": "Navigates to the register view",
+          "parameters": null,
+          "return_type": "void"
+        },
+        {
+          "name": "navigateToLogin",
+          "description": "Navigates to the login view",
+          "parameters": null,
+          "return_type": "void"
+        }
+      ],
+      "dependencies": [
+        "stacked/stacked.dart",
+        "my_app/services/authentication_service.dart",
+        "my_app/app/app.router.dart",
+        "stacked_services/stacked_services.dart"
+      ]
+    },
+    {
+      "name": "lib/ui/bottom_sheets/notice/notice_sheet.dart",
+      "description": "Auto-generated entry for lib/ui/bottom_sheets/notice/notice_sheet.dart (analysis failed)",
+      "class_diagram": "@startuml\nclass Auto\n@enduml",
+      "methods": [],
+      "dependencies": []
+    },
+    {
+      "name": "lib/features/consultation/add_consultation_view.dart",
+      "description": "Auto-generated entry for lib/features/consultation/add_consultation_view.dart (analysis failed)",
+      "class_diagram": "@startuml\nclass Auto\n@enduml",
+      "methods": [],
+      "dependencies": []
+    },
+    {
+      "name": "lib/app/app.router.dart",
+      "description": "This file is responsible for managing the navigation and routing within the Flutter application. It is automatically generated by the StackedNavigatorGenerator tool, which is part of the Stacked architecture pattern. The main purpose of this file is to provide a centralized and type-safe way to manage the application's navigation, making it easier to maintain and scale the app's navigation logic.",
+      "class_diagram": "@startuml\nclass Routes {\n  +static String homeView\n  +static String startupView\n  +static Set<String> all\n}\n\nclass StackedRouter {\n  +List<RouteDef> get routes\n  +Map<Type, StackedRouteFactory> get pagesMap\n}\n\nclass NavigatorStateExtension {\n  +Future<dynamic> navigateToHomeView()\n  +Future<dynamic> navigateToStartupView()\n  +Future<dynamic> replaceWithHomeView()\n  +Future<dynamic> replaceWithStartupView()\n}\n@enduml",
+      "methods": [
+        {
+          "name": "Routes.all",
+          "description": "A set of all the named routes defined in the application.",
+          "parameters": null,
+          "return_type": "Set<String>"
+        },
+        {
+          "name": "StackedRouter.routes",
+          "description": "A list of all the route definitions in the application.",
+          "parameters": null,
+          "return_type": "List<RouteDef>"
+        },
+        {
+          "name": "StackedRouter.pagesMap",
+          "description": "A map of page types to their corresponding route factories, which are used to create the pages when navigating.",
+          "parameters": null,
+          "return_type": "Map<Type, StackedRouteFactory>"
+        },
+        {
+          "name": "NavigatorStateExtension.navigateToHomeView",
+          "description": "Navigates to the HomeView route.",
+          "parameters": null,
+          "return_type": "Future<dynamic>"
+        },
+        {
+          "name": "NavigatorStateExtension.navigateToStartupView",
+          "description": "Navigates to the StartupView route.",
+          "parameters": null,
+          "return_type": "Future<dynamic>"
+        },
+        {
+          "name": "NavigatorStateExtension.replaceWithHomeView",
+          "description": "Replaces the current route with the HomeView route.",
+          "parameters": null,
+          "return_type": "Future<dynamic>"
+        },
+        {
+          "name": "NavigatorStateExtension.replaceWithStartupView",
+          "description": "Replaces the current route with the StartupView route.",
+          "parameters": null,
+          "return_type": "Future<dynamic>"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "package:my_app/features/home/home_view.dart",
+        "package:my_app/features/startup/startup_view.dart",
+        "package:stacked/stacked.dart",
+        "package:stacked_services/stacked_services.dart"
+      ]
     }
   ],
   "dependencies": [
@@ -137,7 +2127,7 @@
       "purpose": "Creating gaps in layouts"
     }
   ],
-  "sequence_diagram": "@startuml\nactor User\nparticipant main\nparticipant AppView\nparticipant StartupView\nparticipant StartupViewModel\nparticipant HomeView\nparticipant HomeViewModel\n\nUser -> main: Launch app\nmain -> AppView: Create and run\nAppView -> StartupView: Initialize\nStartupView -> StartupViewModel: Run startup logic\nStartupViewModel -> HomeView: Navigate on completion\nHomeView -> HomeViewModel: Initialize\nUser -> HomeView: Interact\nHomeView -> HomeViewModel: Handle user actions\nHomeViewModel -> HomeView: Update UI\nHomeViewModel -> DialogService: Show dialog\nHomeViewModel -> BottomSheetService: Show bottom sheet\n@enduml",
-  "state_management_flow": "State is managed using the Stacked architecture. ViewModels (e.g., HomeViewModel, StartupViewModel) handle the business logic and state for their respective views. The app.locator.dart file sets up dependency injection, while app.router.dart manages navigation between views.",
-  "navigation_flow": "The application starts with main.dart, which sets up the app and runs AppView. AppView initializes the Stacked architecture and shows the StartupView. After completing initialization logic, it navigates to the HomeView. Navigation between views is handled by the Stacked Router defined in app.router.dart."
+  "sequence_diagram": "@startuml\nactor User\nparticipant AppView\nparticipant DashboardView\nparticipant DashboardViewModel\nparticipant PatientsView\nparticipant PatientsViewModel\nparticipant ConsultationView\nparticipant ConsultationViewModel\nparticipant LoginView\nparticipant AuthViewModel\n\nUser -> AppView: Launch app\nAppView -> DashboardView: Display dashboard\nDashboardView -> DashboardViewModel: Load dashboard data\nDashboardViewModel -> DashboardView: Update UI with data\n\nUser -> PatientsView: View patient list\nPatientsView -> PatientsViewModel: Load patient data\nPatientsViewModel -> PatientsView: Update UI with patient data\nUser -> PatientsView: Add new patient\nPatientsView -> PatientsViewModel: Save new patient\nPatientsViewModel -> PatientsRepository: Create new patient\nPatientsRepository -> PatientsView: Confirm patient creation\n\nUser -> ConsultationView: View consultation details\nConsultationView -> ConsultationViewModel: Load consultation data\nConsultationViewModel -> ConsultationView: Update UI with consultation details\nUser -> ConsultationView: Add new diagnosis\nConsultationView -> ConsultationViewModel: Save new diagnosis\nConsultationViewModel -> ConsultationRepository: Add new diagnosis\nConsultationRepository -> ConsultationView: Confirm diagnosis creation\n\nUser -> LoginView: Enter login credentials\nLoginView -> AuthViewModel: Attempt login\nAuthViewModel -> AuthenticationService: Authenticate user\nAuthenticationService -> LoginView: Confirm login success\n@enduml",
+  "state_management_flow": "The application uses the Stacked architecture's view model pattern for state management. Each view (e.g., DashboardView, PatientsView, ConsultationView) has a corresponding view model (DashboardViewModel, PatientsViewModel, ConsultationViewModel) that handles the business logic and state updates. The view models interact with various service classes (e.g., ConsultationService, PatientsRepository) to fetch and manipulate data, which is then reflected in the UI through the view's build method.",
+  "navigation_flow": "The application's navigation is managed using the Stacked Router, which is defined in the app.router.dart file. The router defines the available routes (e.g., HomeView, StartupView) and the corresponding page factories. Navigation between views is handled using the NavigatorStateExtension methods provided by the Stacked Router, such as navigateToHomeView() and navigateToStartupView(). The AppView initializes the Stacked Router and serves as the root widget for the application."
 }
