@@ -1,7 +1,7 @@
 {
   "package_name": "com.walturn.my_app",
-  "project_description": "The Flutter application is a healthcare management platform that allows users to manage patient consultations, diagnoses, and other medical records. It features a dashboard view, a patient management system, a consultation management module, and authentication functionality.",
-  "architecture_overview": "The application follows the Stacked architecture pattern, which provides a clear separation of concerns between the user interface, view models, and service layers. It uses Stacked for state management, routing, and dependency injection, as well as the shared_preferences package for local data storage.",
+  "project_description": "The Flutter application is a healthcare management platform that allows users to manage patient consultations, diagnoses, and other medical records. It features a dashboard view, a patient management system, a consultation management module, and authentication functionality. The application supports login, registration, and password reset functionality, as well as the ability to create, view, and manage patient records, consultations, and diagnoses.",
+  "architecture_overview": "The application follows the Stacked architecture pattern, which provides a clear separation of concerns between the user interface, view models, and service layers. It uses Stacked for state management, routing, and dependency injection, as well as the shared_preferences package for local data storage. The application is structured with a centralized AppView that manages the navigation and routes, and various feature-specific views (e.g., Dashboard, Patients, Consultations) that are linked to their corresponding view models. The view models handle the business logic and data management, while the services and repositories abstract the interaction with the backend API and data sources.",
   "files": [
     {
       "name": "lib/app/app.dart",
@@ -2103,6 +2103,230 @@
         "package:stacked/stacked.dart",
         "package:stacked_services/stacked_services.dart"
       ]
+    },
+    {
+      "name": "lib/features/consultation/consultation_form.dart",
+      "description": "The `ConsultationForm` class is responsible for rendering a customizable form that allows users to submit information related to a medical consultation. It provides a centralized interface for collecting and submitting consultation data, such as the chief complaint, symptoms, notes, and follow-up date.",
+      "class_diagram": "@startuml\nclass ConsultationForm {\n  -GlobalKey<FormState> _formKey\n  -TextEditingController _chiefComplaintController\n  -TextEditingController _notesController\n  -List<String> _symptoms\n  -DateTime? _followUpDate\n  \n  +ConsultationForm({required onSubmit, isLoading = false})\n  +build(context): Widget\n  +_handleSubmit(): void\n  +dispose(): void\n}\n\nclass ConsultationFormState {\n  +createState(): ConsultationFormState\n}\n\nConsultationForm o-- ConsultationFormState\n@enduml",
+      "methods": [
+        {
+          "name": "ConsultationForm",
+          "description": "Constructor for the `ConsultationForm` widget. Accepts a required `onSubmit` callback function and an optional `isLoading` boolean to control the state of the submit button.",
+          "parameters": [
+            "onSubmit",
+            "isLoading"
+          ],
+          "return_type": null
+        },
+        {
+          "name": "build",
+          "description": "Builds the UI for the `ConsultationForm` widget, including the form fields and the submit button.",
+          "parameters": [
+            "context"
+          ],
+          "return_type": "Widget"
+        },
+        {
+          "name": "_handleSubmit",
+          "description": "Validates the form and, if valid, calls the `onSubmit` callback with the form data as a map.",
+          "parameters": null,
+          "return_type": "void"
+        },
+        {
+          "name": "dispose",
+          "description": "Disposes of the `_chiefComplaintController` and `_notesController` text editing controllers when the widget is destroyed.",
+          "parameters": null,
+          "return_type": "void"
+        }
+      ],
+      "dependencies": [
+        "package:flutter/material.dart",
+        "../ui/widgets/custom_text_field.dart"
+      ]
+    },
+    {
+      "name": "lib/repositories/patients_repository.dart",
+      "description": "The PatientsRepository class is responsible for managing and interacting with patient data within the application. It serves as a centralized point of access for fetching, creating, and deleting patient records, abstracting away the underlying API service and data model.",
+      "class_diagram": "@startuml\nclass PatientsRepository {\n  +Future<List<Patient>> getPatients()\n  +Future<Patient> getPatientById(String id)\n  +Future<Patient> createPatient(Map<String, dynamic> patientData)\n  +Future<void> deletePatient(String id)\n  -String _handlePatientError(dynamic error)\n}\n\nclass Patient {\n  +String id\n  +String name\n  +String email\n  +String phoneNumber\n}\n\nPatientsRepository --> Patient\nPatientsRepository o-- ApiService\n@enduml",
+      "methods": [
+        {
+          "name": "getPatients",
+          "description": "Retrieves a list of all patients from the API service.",
+          "parameters": null,
+          "return_type": "Future<List<Patient>>"
+        },
+        {
+          "name": "getPatientById",
+          "description": "Retrieves a single patient by their unique ID.",
+          "parameters": [
+            "String id"
+          ],
+          "return_type": "Future<Patient>"
+        },
+        {
+          "name": "createPatient",
+          "description": "Creates a new patient record with the provided data.",
+          "parameters": [
+            "Map<String, dynamic> patientData"
+          ],
+          "return_type": "Future<Patient>"
+        },
+        {
+          "name": "deletePatient",
+          "description": "Deletes an existing patient by their unique ID.",
+          "parameters": [
+            "String id"
+          ],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "_handlePatientError",
+          "description": "Handles and transforms errors that occur during patient data processing.",
+          "parameters": [
+            "dynamic error"
+          ],
+          "return_type": "String"
+        }
+      ],
+      "dependencies": [
+        "package:injectable/injectable.dart",
+        "package:my_app/app/app.locator.dart",
+        "package:my_app/models/patient.dart",
+        "package:my_app/services/api_service.dart"
+      ]
+    },
+    {
+      "name": "lib/repositories/dashboard_repository.dart",
+      "description": "The DashboardRepository class is responsible for fetching and managing the data required for the application's dashboard. It serves as an intermediary between the UI layer and the backend API, providing a unified interface for accessing critical dashboard-related information.",
+      "class_diagram": "@startuml\nclass DashboardRepository {\n  +Future<Map<String, dynamic>> getDashboardStats()\n  +Future<List<Consultation>> getRecentConsultations()\n  +Future<List<Patient>> getRecentPatients()\n  -String _handleDashboardError(dynamic error)\n}\n\nclass ApiService {\n  +Future<Map<String, dynamic>> get(String endpoint)\n}\n\nclass Consultation {\n  +Consultation.fromJson(Map<String, dynamic> json)\n}\n\nclass Patient {\n  +Patient.fromJson(Map<String, dynamic> json)\n}\n\nDashboardRepository -down-> ApiService\nDashboardRepository -right-> Consultation\nDashboardRepository -right-> Patient\n@endUml",
+      "methods": [
+        {
+          "name": "getDashboardStats",
+          "description": "Retrieves the overall statistics and metrics for the dashboard, such as total patients, recent consultations, and other high-level data.",
+          "parameters": null,
+          "return_type": "Future<Map<String, dynamic>>"
+        },
+        {
+          "name": "getRecentConsultations",
+          "description": "Fetches a list of the most recent consultations, which can be displayed in the dashboard's 'Recent Consultations' section.",
+          "parameters": null,
+          "return_type": "Future<List<Consultation>>"
+        },
+        {
+          "name": "getRecentPatients",
+          "description": "Retrieves a list of the most recent patients, which can be displayed in the dashboard's 'Recent Patients' section.",
+          "parameters": null,
+          "return_type": "Future<List<Patient>>"
+        },
+        {
+          "name": "_handleDashboardError",
+          "description": "A private method that handles errors that occur during the retrieval of dashboard-related data, and returns a user-friendly error message.",
+          "parameters": [
+            "dynamic error"
+          ],
+          "return_type": "String"
+        }
+      ],
+      "dependencies": [
+        "injectable/injectable.dart",
+        "my_app/app/app.locator.dart",
+        "my_app/models/consultation.dart",
+        "my_app/models/patient.dart",
+        "my_app/services/api_service.dart"
+      ]
+    },
+    {
+      "name": "lib/repositories/auth_repository.dart",
+      "description": "The AuthRepository class is responsible for handling user authentication-related operations, including login and registration. It acts as an intermediary between the application and the API service, abstracting away the details of making API calls and handling authentication-related errors.",
+      "class_diagram": "@startuml\nclass AuthRepository {\n  +login(email: String, password: String): Future<Map<String, dynamic>>\n  +register(name: String, email: String, password: String, specialization: String): Future<Map<String, dynamic>>\n  -_handleAuthError(error: dynamic): String\n}\n\nAuthRepository o-- ApiService\n@enduml",
+      "methods": [
+        {
+          "name": "login",
+          "description": "Sends a login request to the API service using the provided email and password credentials. Returns the API response as a Map.",
+          "parameters": [
+            "email: String",
+            "password: String"
+          ],
+          "return_type": "Future<Map<String, dynamic>>"
+        },
+        {
+          "name": "register",
+          "description": "Sends a registration request to the API service using the provided name, email, password, and specialization. Returns the API response as a Map.",
+          "parameters": [
+            "name: String",
+            "email: String",
+            "password: String",
+            "specialization: String"
+          ],
+          "return_type": "Future<Map<String, dynamic>>"
+        },
+        {
+          "name": "_handleAuthError",
+          "description": "Handles any errors that occur during authentication-related operations and returns a user-friendly error message.",
+          "parameters": [
+            "error: dynamic"
+          ],
+          "return_type": "String"
+        }
+      ],
+      "dependencies": [
+        "package:injectable/injectable.dart",
+        "package:my_app/app/app.locator.dart",
+        "package:my_app/models/user.dart",
+        "package:my_app/services/api_service.dart"
+      ]
+    },
+    {
+      "name": "lib/repositories/consultation_repository.dart",
+      "description": "The ConsultationRepository is responsible for managing the CRUD (Create, Read, Update, Delete) operations for consultations in the application. It serves as the main access point for interacting with consultation data, providing methods to fetch, create, and delete consultations.",
+      "class_diagram": "@startuml\nclass ConsultationRepository {\n  +Future<List<Consultation>> getConsultations()\n  +Future<Consultation> getConsultationById(String id)\n  +Future<Consultation> createConsultation(Map<String, dynamic> data)\n  +Future<void> deleteConsultation(String id)\n  -String _handleConsultationError(dynamic error)\n}\n\nConsultationRepository o-- ApiService\n@enduml",
+      "methods": [
+        {
+          "name": "getConsultations",
+          "description": "Retrieves a list of all consultations from the API",
+          "parameters": null,
+          "return_type": "Future<List<Consultation>>"
+        },
+        {
+          "name": "getConsultationById",
+          "description": "Retrieves a specific consultation by its ID from the API",
+          "parameters": [
+            "String id"
+          ],
+          "return_type": "Future<Consultation>"
+        },
+        {
+          "name": "createConsultation",
+          "description": "Creates a new consultation in the API with the provided data",
+          "parameters": [
+            "Map<String, dynamic> data"
+          ],
+          "return_type": "Future<Consultation>"
+        },
+        {
+          "name": "deleteConsultation",
+          "description": "Deletes a specific consultation by its ID from the API",
+          "parameters": [
+            "String id"
+          ],
+          "return_type": "Future<void>"
+        },
+        {
+          "name": "_handleConsultationError",
+          "description": "Handles errors that occur during consultation-related operations",
+          "parameters": [
+            "dynamic error"
+          ],
+          "return_type": "String"
+        }
+      ],
+      "dependencies": [
+        "package:injectable/injectable.dart",
+        "package:my_app/models/consultation.dart",
+        "package:my_app/models/diagnosis.dart",
+        "package:my_app/services/api_service.dart",
+        "package:my_app/app/app.locator.dart"
+      ]
     }
   ],
   "dependencies": [
@@ -2128,6 +2352,6 @@
     }
   ],
   "sequence_diagram": "@startuml\nactor User\nparticipant AppView\nparticipant DashboardView\nparticipant DashboardViewModel\nparticipant PatientsView\nparticipant PatientsViewModel\nparticipant ConsultationView\nparticipant ConsultationViewModel\nparticipant LoginView\nparticipant AuthViewModel\n\nUser -> AppView: Launch app\nAppView -> DashboardView: Display dashboard\nDashboardView -> DashboardViewModel: Load dashboard data\nDashboardViewModel -> DashboardView: Update UI with data\n\nUser -> PatientsView: View patient list\nPatientsView -> PatientsViewModel: Load patient data\nPatientsViewModel -> PatientsView: Update UI with patient data\nUser -> PatientsView: Add new patient\nPatientsView -> PatientsViewModel: Save new patient\nPatientsViewModel -> PatientsRepository: Create new patient\nPatientsRepository -> PatientsView: Confirm patient creation\n\nUser -> ConsultationView: View consultation details\nConsultationView -> ConsultationViewModel: Load consultation data\nConsultationViewModel -> ConsultationView: Update UI with consultation details\nUser -> ConsultationView: Add new diagnosis\nConsultationView -> ConsultationViewModel: Save new diagnosis\nConsultationViewModel -> ConsultationRepository: Add new diagnosis\nConsultationRepository -> ConsultationView: Confirm diagnosis creation\n\nUser -> LoginView: Enter login credentials\nLoginView -> AuthViewModel: Attempt login\nAuthViewModel -> AuthenticationService: Authenticate user\nAuthenticationService -> LoginView: Confirm login success\n@enduml",
-  "state_management_flow": "The application uses the Stacked architecture's view model pattern for state management. Each view (e.g., DashboardView, PatientsView, ConsultationView) has a corresponding view model (DashboardViewModel, PatientsViewModel, ConsultationViewModel) that handles the business logic and state updates. The view models interact with various service classes (e.g., ConsultationService, PatientsRepository) to fetch and manipulate data, which is then reflected in the UI through the view's build method.",
-  "navigation_flow": "The application's navigation is managed using the Stacked Router, which is defined in the app.router.dart file. The router defines the available routes (e.g., HomeView, StartupView) and the corresponding page factories. Navigation between views is handled using the NavigatorStateExtension methods provided by the Stacked Router, such as navigateToHomeView() and navigateToStartupView(). The AppView initializes the Stacked Router and serves as the root widget for the application."
+  "state_management_flow": "The application uses the Stacked architecture's view model pattern for state management. Each view (e.g., DashboardView, PatientsView, ConsultationView) has a corresponding view model (DashboardViewModel, PatientsViewModel, ConsultationViewModel) that handles the business logic and state updates. The view models interact with various service classes (e.g., ConsultationService, PatientsRepository) to fetch and manipulate data, which is then reflected in the UI through the view's build method. The view models also leverage the Stacked framework's reactive programming features, such as notifyListeners(), to efficiently update the UI when the underlying state changes.",
+  "navigation_flow": "The application's navigation is managed using the Stacked Router, which is defined in the app.router.dart file. The router defines the available routes (e.g., HomeView, StartupView) and the corresponding page factories. Navigation between views is handled using the NavigatorStateExtension methods provided by the Stacked Router, such as navigateToHomeView() and navigateToStartupView(). The AppView initializes the Stacked Router and serves as the root widget for the application, providing a centralized point for managing the navigation flow and transitions between different screens."
 }
